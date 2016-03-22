@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ title }}</title>
+
+	<!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/stylesheets/signin.css" rel="stylesheet">
+
+    <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
+  </head>
+  <body>
+    <h1>{{ title }}</h1>
+    <p>Welcome to {{ title }}</p>
+    <div class="container">
+
+    <form action="/register"  method="post">
+      <fieldset class="regfields">
+		<legend>Register</legend>
+		<div>
+		  <label for="uname">Username</label>
+		  <input id="uname" type="text" name="uname">
+		</div>
+		<div>
+		  <label for="pword">Password</label>
+		  <input id="pword" type="password" name="pword">
+		</div>
+		<div>
+		  <label for="pword2">Password (again)</label>
+		  <input id="pword2" type="password" name="pword2">
+		</div>
+		<div><input type="submit" name="submit" value="Register"></div>
+      </fieldset>
+    </form>
+    </div> 
+  </body>
+</html>

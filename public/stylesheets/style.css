@@ -1,0 +1,60 @@
+fieldset {
+border:1px solid #888;
+border-right:1px solid #666;
+border-bottom:1px solid #666;
+width:300px;
+}
+legend {
+font-weight:bold;
+border:1px solid #888;
+border-right:1px solid #666;
+border-bottom:1px solid #666;
+padding: 0.5em;
+background-color:#666;
+color:#fff;
+text-shadow:0 -1px 0 #333;
+letter-spacing: 0.1em;
+text-transform:uppercase;
+}
+input {
+display:block;
+width:175px;
+float:left;
+margin-bottom:10px;
+}
+label {
+display:block;
+text-align:right;
+float:left;
+width:75px;
+padding-right: 20px;
+}
+.checkbox {
+width: 1em;
+}
+br {
+clear:left;
+}
+.buttonsubmit {
+width: 75px;
+margin-left:95px;
+}
+
+.deletebtn {
+	width: 45px;
+	margin: 2px;
+	border : solid 0px #000000;
+	border-radius : 5px;
+	font-size : 10px;
+	color : #ffffff;
+	padding : 1px 2px;
+	background : #ff0000;
+}
+
+.item {
+		color:inherit;
+	text-decoration: none;
+}
+.item:hover {
+	text-decoration: underline;
+}
