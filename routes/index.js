@@ -1,37 +1,36 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
 
-var bootvars = require('../bootvars');
-var auth = require('./auth');
-var user = require('./user');
+var session = require('./session');
 var feed = require('./feed');
 
 
 router.get('/', function(req, res) {
-	if (req.session.username) {
-        res.redirect('/'+req.session.username);
+    if (req.session.username) {
+        res.redirect(req.session.username);
         return;
     }
-    
-	res.render('login', { title: 'ppfeed' });
+    res.render('login', { title: 'ppfeed' });
 });
 
 router.get('/ppfeed.png', function(req, res) {
-    res.sendfile('public/images/ppfeed.png');
+    res.sendFile(path.join(__dirname, '..' ,'public/images/ppfeed.png'));
 });
 
-router.post('/login', auth.login);
-router.get('/logout', auth.logout);
+router.post('/login', session.login);
+router.get('/logout', session.logout);
 
-router.get('/register', user.register);
-router.post('/register', user.newUser);
+//Disabled for now
+//router.get('/register', user.register);
+//router.post('/register', user.newUser);
 
-router.post('/delete', auth.ensureLoggedIn, feed.deleteitem);
-router.post('/add', auth.ensureLoggedIn, feed.additem);
-router.post('/items/:item/delete', auth.ensureLoggedIn, feed.deleteitem);
-router.post('/items/:item/add', auth.ensureLoggedIn, feed.additem);
+router.post('/delete', session.ensureLoggedIn, feed.deleteitem);
+router.post('/add', session.ensureLoggedIn, feed.additem);
+router.post('/items/:item/delete', session.ensureLoggedIn, feed.deleteitem);
+router.post('/items/:item/add', session.ensureLoggedIn, feed.additem);
 
-router.get('/:user', auth.ensureLoggedIn, auth.ensurePersonal, feed.items);
+router.get('/:user', session.ensureLoggedIn, session.ensurePersonal, feed.items);
 
 router.get('/:user/rss', feed.xml);
 

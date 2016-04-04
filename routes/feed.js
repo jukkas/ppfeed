@@ -1,5 +1,7 @@
 var db = require('../db');
 var moment = require('moment');
+var Entities = require('html-entities').XmlEntities;
+var entities = new Entities();
 
 exports.items = function (req, res) {
     db.getUserItems(req.params.user, function (items) {
@@ -12,7 +14,6 @@ exports.items = function (req, res) {
 };
 
 exports.xml = function (req, res) {
-    //req.session = null;
     db.getUserItems(req.params.user, function (items) {
         if (items && items.length > 0) {
             var channelTitle = 'Personal Podcast Feed for ' + req.params.user;
@@ -37,7 +38,7 @@ exports.xml = function (req, res) {
             for (var r = 0; r < items.length; r++) {
                 res.write('  <item>\n');
                 res.write('    <title>');
-                res.write(items[r].title.encodeHTML());
+                res.write(entities.encode(items[r].title));
                 res.write('</title>\n');
                 if (items[r].link && items[r].link.length > 0) {
                     res.write('    <link><![CDATA[');
@@ -48,7 +49,7 @@ exports.xml = function (req, res) {
                 res.write(items[r].media_url.replace('&','_'));
                 res.write('</guid>\n');
                 res.write('    <description><![CDATA[');
-                res.write(items[r].description ? items[r].description.encodeHTML() : ' ');
+                res.write(items[r].description ? entities.encode(items[r].description) : ' ');
                 res.write(']]></description>\n');
                 res.write('    <enclosure url="');
                 res.write(items[r].media_url);

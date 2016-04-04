@@ -1,68 +1,46 @@
+'use strict';
+
+var dataDir = process.env.PPFEED_DATA_DIR ||
+                process.env.OPENSHIFT_DATA_DIR || __dirname;
+
+var path = require('path');
 var fs = require("fs");
-var file = "ppfeed.db";
-var exists = fs.existsSync(file);
+var hash = require('./routes/hash'); // For hash
+
+var dbFile = path.join(dataDir, 'ppfeed.db');
+var dbExists = fs.existsSync(dbFile);
 
 var sqlite3 = require("sqlite3").verbose();
-var db = new sqlite3.Database(file);
+var db = new sqlite3.Database(dbFile);
 
 
-var getAdmins = function(callback) {
-   db.all('SELECT username FROM Admins',
-          function(err, result) {
-              if (err) console.log(err);
-              callback(err,result);
-          });
-}
-exports.getAdmins = getAdmins;
-
-db.serialize(function() {
-  if(!exists) {
-    db.run("CREATE TABLE Users (username TEXT NOT NULL UNIQUE," +
-           "hash TEXT, salt TEXT, regtime DATETIME, lasttime DATETIME)");
-    db.run("CREATE TABLE Items (id INTEGER PRIMARY KEY,username TEXT," +
-           "media_url TEXT,title TEXT,description TEXT," +
-           "link TEXT,time DATETIME)");
-    db.run("CREATE TABLE Admins (username TEXT)");
-  }
-
-  if (global.admins === undefined) {
-    console.log('Getting admin list');
-    db.all('SELECT username FROM Admins', function(err, result) {
-        if (err) {
-            console.log('Error: db:admins:',err);
-            global.admins = [];
-        } else {
-            global.admins = result;
-            console.log('Admins:', result);
-        }
-    });
-  }
-});
-
-exports.getUser = function(username, callback) {
-   db.all('SELECT * '+
-          'FROM Users WHERE username = ?', username, callback);
-}
-
-exports.addUser = function(username, hash, salt, callback) {
+var addUser = function(username, hash, salt, callback) {
     var time = new Date().toISOString();
     var sql = 'INSERT INTO Users'+
               '(username, hash, salt, regtime, lasttime) VALUES '+
               '(?, ?, ?, ?, ?)';
-    console.log('@@db.addUser:',sql, username, hash, salt);
     db.run(sql, username, hash, salt, time, time, callback);
 }
 
-exports.userCount = function userCount(callback) {
-   db.all('SELECT count(*) as count FROM Users',
-          function(err, result) {
-              if (err) {
-                  console.log(err);
-                  callback(0);
-              } else {
-				callback(result[0].count);
-			  }
-          });
+
+db.serialize(function() {
+    if(!dbExists) {
+        db.run("CREATE TABLE Users (username TEXT NOT NULL UNIQUE," +
+                "hash TEXT, salt TEXT, regtime DATETIME, lasttime DATETIME)");
+        db.run("CREATE TABLE Items (id INTEGER PRIMARY KEY,username TEXT," +
+                "media_url TEXT,title TEXT,description TEXT," +
+                "link TEXT,time DATETIME)");
+        // Create default user
+        var username = process.env.PPFEED_DEFAULT_USERNAME || 'default';
+        var password = process.env.PPFEED_DEFAULT_PASSWORD || 'default';
+        hash.hash(password, function (err, hash, salt) {
+            addUser(username, hash, salt);
+        });
+    }
+});
+
+exports.getUser = function(username, callback) {
+    db.all('SELECT * FROM Users WHERE username = ?', username, callback);
 }
 
 exports.getUserItems = function(username, callback) {
@@ -94,10 +72,4 @@ exports.addItem = function(username, media_url, title, description, link) {
             console.log(sql, username, media_url, title, description, link, currentTime);
             db.run(sql, username, media_url, title, description, link, currentTime);
     }
-}
-
-exports.addAdmin = function(username, callback) {
-    var sql = 'INSERT INTO Admins VALUES (?)';
-    console.log('Adding new administrator:',sql, username);
-    db.run(sql, username, callback);
 }
