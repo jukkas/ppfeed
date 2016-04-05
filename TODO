@@ -1,12 +1,5 @@
 Ppfeed notes:
 
-* Uusi toiminnallisuus: Satunnaisfeedit
-- Taulu/lista feedeistä: (id, url, name)
-- Klikatessa hae feedi, parse and display list of items (title, date,
-  part of description, link, image?)
-  - cache for an hour
-     - refresh link
-- for each item, button to add to personal feed
 * Seuraava virhe edelleen mp3-URL:issa!!
 Fataali Bugi: jotain kummaa tässä (&-merkki?):
 Ratkaisu: linkit CDATA:n sisälle: <![CDATA[ http://maps.google.com/FortWorth&Texas,more+url;data ]]>

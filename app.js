@@ -39,6 +39,6 @@ app.use('/', routes);
 
 // Start server
 app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000);
-app.listen(app.get('port'), function() {
+app.listen(app.get('port'), 'localhost', function() {
     console.log('Express server listening on port ' + app.get('port'));
 });

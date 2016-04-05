@@ -30,9 +30,11 @@ db.serialize(function() {
         db.run("CREATE TABLE Items (id INTEGER PRIMARY KEY,username TEXT," +
                 "media_url TEXT,title TEXT,description TEXT," +
                 "link TEXT,time DATETIME)");
+        db.run("CREATE TABLE ExtFeeds (id INTEGER PRIMARY KEY, username TEXT," +
+                "url TEXT, title TEXT)");
         // Create default user
-        var username = process.env.PPFEED_DEFAULT_USERNAME || 'default';
-        var password = process.env.PPFEED_DEFAULT_PASSWORD || 'default';
+        var username = process.env.PPFEED_DEFAULT_USERNAME || 'jukka';
+        var password = process.env.PPFEED_DEFAULT_PASSWORD || 'js';
         hash.hash(password, function (err, hash, salt) {
             addUser(username, hash, salt);
         });
@@ -72,4 +74,29 @@ exports.addItem = function(username, media_url, title, description, link) {
             console.log(sql, username, media_url, title, description, link, currentTime);
             db.run(sql, username, media_url, title, description, link, currentTime);
     }
+}
+
+exports.getExtFeeds = function(username, callback) {
+    db.all('SELECT * FROM ExtFeeds WHERE username=?', username, callback);
+}
+
+exports.deleteExtFeed = function(id, user, callback) {
+    if (id && user) {
+        console.log('DELETE FROM ExtFeeds WHERE id='+id,'AND username='+user);
+        db.run('DELETE FROM ExtFeeds WHERE id=? AND username=?', id, user, callback);
+    }
+}
+
+exports.addExtFeed = function(username, url, title, callback) {
+    if (username && url && title) {
+        var sql = 'INSERT INTO ExtFeeds'+
+                '(username, url, title) VALUES '+
+                '(?, ?, ?)';
+        console.log(sql, username, url, title);
+        db.run(sql, username, url, title, callback);
+    }
+}
+
+exports.getExtFeed = function(id, callback) {
+    db.all('SELECT * FROM ExtFeeds WHERE id = ?', id, callback);
 }
