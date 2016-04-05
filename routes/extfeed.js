@@ -19,13 +19,14 @@ function cleanCache() {
 
 // Render external feeds of a user
 exports.feeds = function (req, res) {
-    console.log('@@@feeds user:', req.session.username);
+    res.clearCookie('error');
     db.getExtFeeds(req.session.username, function (err, feeds) {
-        //console.log('@@@feeds:', feeds);
+        let errorMsg = req.cookies.error;
+        if (err) errorMsg = err.message;
         res.render('extfeeds', {
             title: 'External feeds for ' + req.session.username,
             user: req.session.username,
-            error: err,
+            error: errorMsg,
             feeds: feeds
         });
     });
@@ -40,8 +41,8 @@ exports.deleteFeed = function (req, res) {
 
 // Add new external feed
 exports.addFeed = function (req, res) {
-
     if (!req.body.url || !req.body.url.startsWith('http')) {
+        res.cookie('error','Invalid url '+req.body.url);
         return res.redirect('extfeeds');
     }
     var meta;
@@ -67,7 +68,8 @@ exports.addFeed = function (req, res) {
          if (err) {
             console.log('addFeed() error:',err, err.stack);
             //return res.render('extfeeds', {error: err});
-            return res.redirect('extfeeds?err='+err.message);
+            res.cookie('error',err.message);
+            return res.redirect('extfeeds');
         }
         if (meta.title)
             db.addExtFeed(req.session.username, req.body.url, meta.title,
