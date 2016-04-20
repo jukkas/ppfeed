@@ -2,48 +2,54 @@
 <html>
 
 <head>
-	<title>{{ title }}</title>
-	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <title>{{ title }}</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link rel='stylesheet' href='stylesheets/style.css' />
 </head>
 
 <body>
 <h2>Add new</h2>
 <div id="newitem">
-	<form name="newitem" action="/add" method="post">
-		<label for="url">URL</label>
-		<input type="text" id="url" name="url">
-		<br>
-		<label for="title">Title</label>
-		<input type="text" id="title" name="title">
-		<br>
-		<label for="desc">Description</label>
-		<textarea id="desc" name="description"></textarea>
-		<br>
-		<label for="link">Link</label>
-		<input type="text" id="link" name="link">
-		<br>
-		<input class="buttonsubmit" type="submit" value="Add">
-	</form>
+    <form class="newitem" name="newitem" action="/add" method="post">
+      <div>
+        <label for="url">URL</label>
+        <input type="text" id="url" name="url">
+      </div>
+      <div>
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title">
+      </div>
+      <div>
+        <label for="desc">Description</label>
+        <textarea id="desc" name="description"></textarea>
+      </div>
+      <div>
+        <label for="link">Link</label>
+        <input type="text" id="link" name="link">
+      </div>
+      <div class="newitembutton">
+        <button type="submit">Add</button>
+      </div>
+    </form>
 </div>
 <br>
 <h2>Items</h2>
 <table>
 {% for item in items %}
-	<tr>
-		<td title="{{ item.description }}">
-			{% if item.link %}<a href="{{ item.link }}" class="item" title="{{ item.description }}">{% endif %}
-			{{ item.title }}
-			{% if item.link %}</a>{% endif %}
-		</td>
-		<td>
-			<form name="delete" action="/delete" method="post">
-				<!-- TODO: RESTify  -->
-				<input type="hidden" name="item", value="{{item.id}}">
-				<input type="submit" value="Delete" class="deletebtn" title="Remove item">
-			</form>
-		</td>
-	</tr>
+    <tr>
+        <td title="{{ item.description }}">
+            {% if item.link %}<a href="{{ item.link }}" class="item" title="{{ item.description }}">{% endif %}
+            {{ item.title }}
+            {% if item.link %}</a>{% endif %}
+        </td>
+        <td>
+            <form name="delete" action="/delete" method="post">
+                <!-- TODO: RESTify  -->
+                <input type="hidden" name="item", value="{{item.id}}">
+                <input type="submit" value="Delete" class="deletebtn" title="Remove item">
+            </form>
+        </td>
+    </tr>
 {% endfor %}
 
 </table>

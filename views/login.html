@@ -6,25 +6,18 @@
 
     <title>{{ title }}</title>
 
-	<!-- Bootstrap core CSS -->
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-	<link href="/stylesheets/signin.css" rel="stylesheet">
+	<link href="stylesheets/login.css" rel="stylesheet">
   </head>
   <body>
-	 <div class="container">
-
-      <form class="form-signin" role="form" action="/login" method="post">
-        <h2 class="form-signin-heading">Please log in</h2>
-        <input type="text" name="uname" class="form-control"
-            placeholder="Username" required autofocus>
-        <input type="password" name="pword"  class="form-control"
-            placeholder="Password" required>
-        <button class="btn btn-lg btn-primary btn-block"
-				type="submit" >
-			Login
-		</button>
-      </form>
-
-	</div> <!-- /container -->
+    <div>
+        <form class="login-form" role="form" action="/login" method="post">
+          <h1>Please log in</h1>
+          <input name="uname" class="form-control" placeholder="Username" required="" autofocus="" type="text">
+          <input name="pword" class="form-control" placeholder="Password" required="" type="password">
+          <button class="submit-button" type="submit">
+  			Login
+  		</button>
+        </form>
+    </div>
   </body>
 </html>

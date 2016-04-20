@@ -18,7 +18,7 @@
 	<tr>
 		<td title="{{ item.description }}">
 			{% if item.link %}<a href="{{ item.link }}" class="item" title="{{ item.description }}">{% endif %}
-			{{ item.title }}
+			{{ item.date.toISOString().substring(0,10) }} {{ item.title }}
 			{% if item.link %}</a>{% endif %}
 		</td>
 		<td>

@@ -8,7 +8,6 @@ var cache = new Map();
 
 // Expire from cache all downloads older than 60 minutes
 function cleanCache() {
-    console.log('@@cleanCache() size:', cache.size);
     cache.forEach(function(value, key, map) {
         if (Date.now() - value.lastDownloaded > 60*60*1000) {
             console.log('cleanCache(): id',key,'expired. Deleting.');
@@ -74,7 +73,7 @@ exports.addFeed = function (req, res) {
         if (meta.title)
             db.addExtFeed(req.session.username, req.body.url, meta.title,
                         function(err, result) {
-                            console.log('@@@addfeed: lastID:',this.lastID);
+                            console.log('addfeed: added lastID:',this.lastID);
                         });
         res.redirect('extfeeds');
     }
@@ -88,7 +87,7 @@ exports.addToPPFeed = function (req, res) {
         console.log('Searching cache for guid:', req.body.guid);
         var item = cache.get(req.params.id).items.find(itm => itm.guid === req.body.guid);
         if (item) {
-            console.log('@@found item:');
+            //console.log('@@found item:');
             console.log(item.title);
             console.log(item.description ? item.description.substring(0,77):'');
             console.log(item.enclosures);
@@ -113,7 +112,7 @@ exports.getFeed = function (req, res) {
     cleanCache();
 
     if (cache.get(req.params.id)) {
-        console.log('@@@Got feed from cache');
+        //console.log('@@@Got feed from cache');
         return res.render('extfeed', cache.get(req.params.id));
     } else {
         console.log('Downloading feed');
@@ -155,7 +154,7 @@ exports.getFeed = function (req, res) {
                 return res.render('extfeed', {error: err});
             }
             feed.lastDownloaded = new Date();
-            console.log('@@caching feed at', feed.lastDownloaded);
+            //console.log('@@caching feed at', feed.lastDownloaded);
             //cache[req.params.id] = feed;
             cache.set(req.params.id, feed);
             return res.render('extfeed', feed);
