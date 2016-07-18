@@ -52,10 +52,14 @@ exports.xml = function (req, res) {
                 res.write(items[r].description ? entities.encode(items[r].description) : ' ');
                 res.write(']]></description>\n');
                 res.write('    <enclosure url="');
-                res.write(items[r].media_url);
-                res.write('" length="0" type="audio/mpeg" />\n');
+                let url = items[r].media_url;
+                res.write(url);
+                if (url.endsWith('.ogg') || url.endsWith('.oga')) {
+                    res.write('" length="0" type="audio/ogg" />\n');
+                } else {
+                    res.write('" length="0" type="audio/mpeg" />\n');
+                }
                 res.write('    <category>Podcasts</category>\n');
-
                 //console.log(typeof items[r].time);
                 //console.log('items[r].time == ' + items[r].time);
                 var pubDate = moment(items[r].time);

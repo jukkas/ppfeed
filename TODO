@@ -1,9 +1,9 @@
 Ppfeed notes:
 
-* jossain tapauksessa tulee linkki /extfeeds/extfeeds/2
 * konfirmaatio extfeedin tuhoamiseen (ja ehkä episodin?)
-* ogg-linkeille oikea tyyppi
 
+
+--- vanhoja ---
 * Seuraava virhe edelleen mp3-URL:issa!!
 Fataali Bugi: jotain kummaa tässä (&-merkki?):
 Ratkaisu: linkit CDATA:n sisälle: <![CDATA[ http://maps.google.com/FortWorth&Texas,more+url;data ]]>
