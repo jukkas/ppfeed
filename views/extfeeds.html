@@ -5,6 +5,15 @@
 	<title>{{ title }}</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <link rel='stylesheet' href='/stylesheets/style.css' />
+ 	<script>
+		function deleteExtFeed(feedId) {
+			if (confirm('Delete feed?') == true) {
+				document.getElementById("delete-extfeed-"+feedId).submit();
+			}
+		}
+	</script>
+
+
 </head>
 
 <body>
@@ -18,10 +27,12 @@
 			</a>
 		</td>
 		<td>
-			<form name="delete" action="extfeeds/{{feed.id}}/delete" method="post">
+			<form id="delete-extfeed-{{feed.id}}" action="../extfeeds/{{feed.id}}/delete" method="post">
 				<!-- TODO: RESTify  -->
 				<input type="hidden" name="item", value="{{feed.id}}">
-				<input type="submit" value="Delete" class="deletebtn" title="Remove feed">
+				<button type="button" onclick="deleteExtFeed({{feed.id}})" class="deletebtn">
+				Delete</button>
+				<!-- <input type="submit" value="Delete" class="deletebtn" title="Remove feed"> -->
 			</form>
 		</td>
 	</tr>
