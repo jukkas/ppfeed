@@ -1,3 +1,4 @@
+"use strict";
 var db = require('../db');
 var moment = require('moment');
 var Entities = require('html-entities').XmlEntities;
