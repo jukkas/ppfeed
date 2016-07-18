@@ -9,7 +9,7 @@
 
 <body>
 <h1>{{ meta.title }}</h1>
-{% if meta.image %}<img src="{{meta.image.url}}">{% endif %}
+{% if meta.image %}<img id="feed-image" src="{{meta.image.url}}">{% endif %}
 {{ meta.description }}
 {% if meta.link %}<br><a href="{{meta.link}}">{{meta.link}}</a>{% endif %}
 <h1>Items</h1>

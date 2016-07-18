@@ -41,6 +41,14 @@ width: 75px;
 margin-left:95px;
 }
 */
+
+tr:nth-child(odd) {
+   background-color: LightGray;
+}
+
+tr:hover {
+  background-color: Wheat;
+}
 .newitem {
     max-width: 700px;
     padding: 1em;
@@ -127,4 +135,10 @@ background-image: url('warning.png');
 color: #D8000C;
 background-color: #FFBABA;
 background-image: url('../images/error.png');
+}
+
+#feed-image {
+    max-width: 150px;
+    width: 100%;
+    height: auto;
 }
