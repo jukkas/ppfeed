@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "ppfeed",
   "private": true,
-  "main": "start.js",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js"
   },
   "author": "Jukka S <jukkas@gmail.com>",
-  "license": "ISC",
+  "license": "proprietary",
   "dependencies": {
     "body-parser": "^1.15.2",
     "cookie-parser": "^1.4.3",
