@@ -1,12 +1,27 @@
 {
-  "name": "openshift-cartridge-nodejs-template",
-  "version": "1.0.1",
-  "description": "Custom Node.js cartridge for OpenShift - sample application",
+  "name": "ppfeed",
+  "version": "1.0.0",
+  "description": "ppfeed",
   "private": true,
   "main": "start.js",
   "scripts": {
-    "start": "node --use_strict start.js"
+    "start": "node app.js"
   },
-  "author": "Ionut-Cristian Florescu <ionut.florescu@gmail.com>",
-  "license": "ISC"
+  "author": "Jukka S <jukkas@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-alpha.1",
+    "debug": "^2.2.0",
+    "express": "^4.14.0",
+    "feedparser": "^1.1.4",
+    "html-entities": "^1.2.0",
+    "moment": "^2.14.1",
+    "morgan": "^1.7.0",
+    "request": "^2.74.0",
+    "serve-favicon": "^2.3.0",
+    "sqlite3": "^3.1.4",
+    "swig": "^1.4.2"
+  }
 }

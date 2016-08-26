@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>{{ title }}</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+ 	<script>
+		function deleteExtFeed(feedId) {
+			if (confirm('Delete feed?') == true) {
+				document.getElementById("delete-extfeed-"+feedId).submit();
+			}
+		}
+	</script>
+
+
+</head>
+
+<body>
+<h2>Feeds</h2>
+<table>
+{% for feed in feeds %}
+	<tr>
+		<td title="{{ feed.title }}">
+			<a href="extfeeds/{{ feed.id }}" class="item" title="{{ feed.title }}">
+			    {{ feed.title }}
+			</a>
+		</td>
+		<td>
+			<form id="delete-extfeed-{{feed.id}}" action="../extfeeds/{{feed.id}}/delete" method="post">
+				<!-- TODO: RESTify  -->
+				<input type="hidden" name="item", value="{{feed.id}}">
+				<button type="button" onclick="deleteExtFeed({{feed.id}})" class="deletebtn">
+				Delete</button>
+				<!-- <input type="submit" value="Delete" class="deletebtn" title="Remove feed"> -->
+			</form>
+		</td>
+	</tr>
+{% endfor %}
+
+</table>
+<br>
+<h2>Add new</h2>
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+<div id="newitem">
+	<form name="newextfeed" action="extfeeds" method="post">
+		<label for="url">URL</label>
+		<input type="text" id="url" name="url">
+		<input class="buttonsubmit" type="submit" value="Add">
+	</form>
+</div>
+<br>
+<div>
+<a href="/">Home</a> <a href="/logout">Logout</a>
+</div>
+
+</body>
+
+</html>

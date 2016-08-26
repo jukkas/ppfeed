@@ -1,43 +1,45 @@
-const http         = require('http'),
-      fs           = require('fs'),
-      path         = require('path'),
-      contentTypes = require('./utils/content-types'),
-      sysInfo      = require('./utils/sys-info'),
-      env          = process.env;
+var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var swig = require('swig');
+var session = require('cookie-session')
 
-let server = http.createServer(function (req, res) {
-  let url = req.url;
-  if (url == '/') {
-    url += 'index.html';
-  }
+var routes = require('./routes/index');
 
-  // IMPORTANT: Your application HAS to respond to GET /health with status 200
-  //            for OpenShift health monitoring
+var app = express();
 
-  if (url == '/health') {
-    res.writeHead(200);
-    res.end();
-  } else if (url == '/info/gen' || url == '/info/poll') {
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Cache-Control', 'no-cache, no-store');
-    res.end(JSON.stringify(sysInfo[url.slice(6)]()));
-  } else {
-    fs.readFile('./static' + url, function (err, data) {
-      if (err) {
-        res.writeHead(404);
-        res.end('Not found');
-      } else {
-        let ext = path.extname(url).slice(1);
-        res.setHeader('Content-Type', contentTypes[ext]);
-        if (ext === 'html') {
-          res.setHeader('Cache-Control', 'no-cache, no-store');
-        }
-        res.end(data);
-      }
-    });
-  }
+// view engine setup
+app.engine('html', swig.renderFile);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'html');
+app.set('view cache', false); // Swig will cache templates
+//temp disable caching
+swig.setDefaults({ cache: false });
+
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('[:date] :remote-addr :method :url :status :res[content-length] ":referrer" ":user-agent"'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Cookie based session
+app.use(session({
+        name: 'SES',
+        secret:'5dx`h2}K*mA86<V4'
+}))
+
+// Routes
+app.get('/health', function (req, res) {
+  res.send('OK');
 });
 
-server.listen(env.NODE_PORT || 3000, env.NODE_IP || 'localhost', function () {
-  console.log(`Application worker ${process.pid} started...`);
+app.use('/', routes);
+
+// Start server
+app.listen(process.env.NODE_PORT || 3000, process.env.NODE_IP || 'localhost', function() {
+    console.log('Express server listening on port ' + app.get('port'));
 });

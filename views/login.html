@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ title }}</title>
+
+	<link href="stylesheets/login.css" rel="stylesheet">
+  </head>
+  <body>
+    <div>
+        <form class="login-form" role="form" action="/login" method="post">
+          <h1>Please log in</h1>
+          <input name="uname" class="form-control" placeholder="Username" required="" autofocus="" type="text">
+          <input name="pword" class="form-control" placeholder="Password" required="" type="password">
+          <button class="submit-button" type="submit">
+  			Login
+  		</button>
+        </form>
+    </div>
+  </body>
+</html>
