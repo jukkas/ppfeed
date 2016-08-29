@@ -1,7 +1,7 @@
 var crypto = require('crypto');
 
-var len = 64;
-var iterations = 12000;
+var len = 32;
+var iterations = 32000;
 
 /**
  * Hashes a password with optional `salt`, otherwise
