@@ -2,6 +2,7 @@
   "name": "ppfeed",
   "version": "0.5.0",
   "description": "Personal Podcast Feed",
+  "private": true,
   "main": "app.js",
   "dependencies": {
     "body-parser": "^1.15.2",
@@ -20,11 +21,12 @@
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "ssh://app.sikamo.net/home/j/git/ppfeed"
+    "url": "ssh://j@app.sikamo.net/home/j/git/ppfeed"
   },
   "keywords": [
     "personal",
