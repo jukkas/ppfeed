@@ -3,6 +3,8 @@ var db = require('../db');
 var moment = require('moment');
 var request = require('request');
 var FeedParser = require('feedparser');
+var debug = require('debug')('ppfeed')
+
 
 var cache = new Map();
 
@@ -10,7 +12,7 @@ var cache = new Map();
 function cleanCache() {
     cache.forEach(function(value, key, map) {
         if (Date.now() - value.lastDownloaded > 60*60*1000) {
-            console.log('cleanCache(): id',key,'expired. Deleting.');
+            debug('cleanCache(): id',key,'expired. Deleting.');
             map.delete(key);
         }
     });
@@ -33,7 +35,7 @@ exports.feeds = function (req, res) {
 
 // Delete external feed
 exports.deleteFeed = function (req, res) {
-    console.log('Deleting feed' + req.params.id);
+    debug('Deleting feed' + req.params.id);
     db.deleteExtFeed(req.params.id, req.session.username);
     res.redirect('..');
 };
@@ -65,7 +67,7 @@ exports.addFeed = function (req, res) {
 
     function done(err) {
          if (err) {
-            console.log('addFeed() error:',err, err.stack);
+            console.error('addFeed() error:',err, err.stack);
             //return res.render('extfeeds', {error: err});
             res.cookie('error',err.message);
             return res.redirect('extfeeds');
@@ -73,7 +75,7 @@ exports.addFeed = function (req, res) {
         if (meta.title)
             db.addExtFeed(req.session.username, req.body.url, meta.title,
                         function(err, result) {
-                            console.log('addfeed: added lastID:',this.lastID);
+                            debug('addfeed: added lastID:',this.lastID);
                         });
         res.redirect('extfeeds');
     }
@@ -81,24 +83,23 @@ exports.addFeed = function (req, res) {
 
 // Add clicked entry from an external feed into personal feed
 exports.addToPPFeed = function (req, res) {
-    console.log('addToPPFeed',req.body, req.params.id);
+    debug('addToPPFeed',req.body, req.params.id);
 
     if (cache.get(req.params.id)) {
-        console.log('Searching cache for guid:', req.body.guid);
+        debug('Searching cache for guid:' + req.body.guid);
         var item = cache.get(req.params.id).items.find(itm => itm.guid === req.body.guid);
         if (item) {
-            //console.log('@@found item:');
-            console.log(item.title);
-            console.log(item.description ? item.description.substring(0,77):'');
-            console.log(item.enclosures);
+            debug(item.title);
+            debug(item.description ? item.description.substring(0,77):'');
+            debug(item.enclosures);
             let enclosure = item.enclosures.find(enc => enc.type && enc.type.startsWith('audio'));
             if (enclosure && enclosure.url) {
-                console.log('Adding new item to personal feed:', item.title);
+                debug('Adding new item to personal feed:', item.title);
                 db.addItem(req.session.username, enclosure.url, item.title,
                     item.description, item.link);
             }
         } else {
-            console.log('Error: guid not found:', req.body.guid);
+            console.warn('Error: guid not found:', req.body.guid);
         }
     } else {
         console.warn('Internal error: feed not found in cache');
@@ -112,13 +113,11 @@ exports.getFeed = function (req, res) {
     cleanCache();
 
     if (cache.get(req.params.id)) {
-        //console.log('@@@Got feed from cache');
         return res.render('extfeed', cache.get(req.params.id));
     } else {
-        console.log('Downloading feed');
+        debug('Downloading feed');
         db.getExtFeed(req.params.id, downloadFeed);
     }
-//    db.getExtFeed(req.params.id, function (err, feedArr) {
     function downloadFeed(err, feedArr) {
         var feed = {meta: {}, items: []};
         if (err || !feedArr || feedArr.length != 1)
@@ -141,7 +140,6 @@ exports.getFeed = function (req, res) {
             var item;
 
             while (item = stream.read()) {
-                //console.log('@@item=',item);
                 feed.items.push(item);
             }
 
@@ -154,8 +152,6 @@ exports.getFeed = function (req, res) {
                 return res.render('extfeed', {error: err});
             }
             feed.lastDownloaded = new Date();
-            //console.log('@@caching feed at', feed.lastDownloaded);
-            //cache[req.params.id] = feed;
             cache.set(req.params.id, feed);
             return res.render('extfeed', feed);
         }

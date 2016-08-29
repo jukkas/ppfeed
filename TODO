@@ -3,6 +3,7 @@ Ppfeed notes:
 * vaihda toiseen swig:istä
 * Lisää takaisin register
 * Käytä expressin validatoria
+* csrf-fiksaus
 
 --- vanhoja ---
 * Seuraava virhe edelleen mp3-URL:issa!!

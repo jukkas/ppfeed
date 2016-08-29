@@ -3,7 +3,6 @@ var hash = require('./hash');
 
 exports.ensureLoggedIn = function(req, res, next) {
     if (req.session.username) {
-        //console.log('Session username data: '+req.session.username);
         next();
     } else {
         res.redirect('/');
@@ -26,7 +25,7 @@ exports.login = function(req, res) {
 
     db.getUser(req.body.uname, function(err, result) {
         if (err) {
-            console.log('Login db failure:', err);
+            console.error('Login db failure:', err);
             return res.redirect('/');
         }
         if (result.length < 1) {

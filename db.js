@@ -3,6 +3,7 @@
 var dataDir = process.env.PPFEED_DATA_DIR ||
                 process.env.OPENSHIFT_DATA_DIR || __dirname;
 
+var debug = require('debug')('ppfeed')
 var path = require('path');
 var fs = require("fs");
 var hash = require('./routes/hash'); // For hash
@@ -60,7 +61,7 @@ exports.getUserItems = function(username, callback) {
 
 exports.deleteItem = function(id, user) {
     if (id && user) {
-        console.log('DELETE FROM Items WHERE id='+id,'AND username='+user);
+        debug('DELETE FROM Items WHERE id='+id,'AND username='+user);
         db.run('DELETE FROM Items WHERE id=? AND username=?', id, user);
     }
 }
@@ -73,7 +74,8 @@ exports.addItem = function(username, media_url, title, description, link) {
                 var sql = 'INSERT INTO Items'+
                   '(username, media_url, title, description, link, time) VALUES '+
                   '(?, ?, ?, ?, ?, ?)';
-            console.log(sql, username, media_url, title, description, link, currentTime);
+            debug(sql, username, media_url, title,
+                description.substring(0, 20)+'...', link, currentTime);
             db.run(sql, username, media_url, title, description, link, currentTime);
     }
 }
@@ -84,7 +86,7 @@ exports.getExtFeeds = function(username, callback) {
 
 exports.deleteExtFeed = function(id, user, callback) {
     if (id && user) {
-        console.log('DELETE FROM ExtFeeds WHERE id='+id,'AND username='+user);
+        debug('DELETE FROM ExtFeeds WHERE id='+id+' AND username='+user);
         db.run('DELETE FROM ExtFeeds WHERE id=? AND username=?', id, user, callback);
     }
 }
@@ -94,7 +96,7 @@ exports.addExtFeed = function(username, url, title, callback) {
         var sql = 'INSERT INTO ExtFeeds'+
                 '(username, url, title) VALUES '+
                 '(?, ?, ?)';
-        console.log(sql, username, url, title);
+        debug(sql, username, url, title);
         db.run(sql, username, url, title, callback);
     }
 }

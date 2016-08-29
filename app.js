@@ -42,5 +42,5 @@ app.use('/', routes);
 
 // Start server
 app.listen(process.env.NODE_PORT || 3000, process.env.NODE_IP || 'localhost', function() {
-    console.log('Express server listening on port ' + app.get('port'));
+    console.log('Express server running...');
 });

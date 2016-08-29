@@ -3,6 +3,7 @@ var db = require('../db');
 var moment = require('moment');
 var Entities = require('html-entities').XmlEntities;
 var entities = new Entities();
+var debug = require('debug')('ppfeed')
 
 exports.items = function (req, res) {
     db.getUserItems(req.params.user, function (items) {
@@ -61,8 +62,6 @@ exports.xml = function (req, res) {
                     res.write('" length="0" type="audio/mpeg" />\n');
                 }
                 res.write('    <category>Podcasts</category>\n');
-                //console.log(typeof items[r].time);
-                //console.log('items[r].time == ' + items[r].time);
                 var pubDate = moment(items[r].time);
                 res.write('    <pubDate>');
                 res.write(pubDate.format('ddd, D MMM YYYY HH:mm:ss ZZ'));
@@ -79,14 +78,13 @@ exports.xml = function (req, res) {
 };
 
 exports.deleteitem = function (req, res) {
-    console.log('req.body.item=' + req.body.item);
-    console.log(req.body);
+    debug('req.body.item=' + req.body.item);
     db.deleteItem(req.body.item, req.session.username);
     res.redirect('/' + req.session.username);
 };
 
 exports.additem = function (req, res) {
-    console.log(req.body);
+    debug(req.body);
     db.addItem(req.session.username, req.body.url, req.body.title,
         req.body.description, req.body.link);
     res.redirect('/' + req.session.username);
