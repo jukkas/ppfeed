@@ -2,3 +2,4 @@
 node_modules
 ppfeed.db
 *.old
+npm-debug.log

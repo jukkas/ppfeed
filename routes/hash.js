@@ -15,7 +15,7 @@ var iterations = 12000;
 
 var hash = function (pwd, salt, fn) {
   if (3 == arguments.length) {
-    crypto.pbkdf2(pwd, salt, iterations, len, function(err, h) {
+    crypto.pbkdf2(pwd, salt, iterations, len, 'sha512', function(err, h) {
         fn(err, h ? h.toString('base64'):null);
     });
   } else {
@@ -23,7 +23,7 @@ var hash = function (pwd, salt, fn) {
     crypto.randomBytes(len, function(err, salt){
       if (err) return fn(err);
       salt = salt.toString('base64');
-      crypto.pbkdf2(pwd, salt, iterations, len, function(err, hash){
+      crypto.pbkdf2(pwd, salt, iterations, len, 'sha512', function(err, hash){
         if (err) return fn(err);
         fn(null, hash.toString('base64'), salt);
       });

@@ -1,5 +1,4 @@
 'use strict';
-
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -30,15 +29,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Cookie based session
 app.use(session({
-	name: 'SES',
-	secret:'5dx`h2}K*mA86<V4'
+    name: 'SES',
+    secret:'5dx`h2}K*mA86<V4'
 }))
 
 // Routes
+app.get('/health', function (req, res) {
+  res.send('OK');
+});
+
 app.use('/', routes);
 
 // Start server
-app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000);
-app.listen(app.get('port'), 'localhost', function() {
+app.listen(process.env.NODE_PORT || 3000, process.env.NODE_IP || 'localhost', function() {
     console.log('Express server listening on port ' + app.get('port'));
 });

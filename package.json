@@ -1,9 +1,14 @@
 {
   "name": "ppfeed",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "Personal Podcast Feed",
   "private": true,
   "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Jukka S <jukkas@gmail.com>",
+  "license": "proprietary",
   "dependencies": {
     "body-parser": "^1.15.2",
     "cookie-parser": "^1.4.3",
@@ -14,7 +19,7 @@
     "html-entities": "^1.2.0",
     "moment": "^2.14.1",
     "morgan": "^1.7.0",
-    "request": "^2.73.0",
+    "request": "^2.74.0",
     "serve-favicon": "^2.3.0",
     "sqlite3": "^3.1.4",
     "swig": "^1.4.2"
@@ -32,7 +37,5 @@
     "personal",
     "podcast",
     "feed"
-  ],
-  "author": "Jukka",
-  "license": "ISC"
+  ]
 }

@@ -19,21 +19,23 @@ var addUser = function(username, hash, salt, callback) {
     var sql = 'INSERT INTO Users'+
               '(username, hash, salt, regtime, lasttime) VALUES '+
               '(?, ?, ?, ?, ?)';
-    db.run(sql, username, hash, salt, time, time, callback);
+    db.run(sql, username, hash, salt, time, time, callback,
+        function(err, result) {});
 }
 
 
 db.serialize(function() {
     if(!dbExists) {
         db.run("CREATE TABLE Users (username TEXT NOT NULL UNIQUE," +
-                "hash TEXT, salt TEXT, regtime DATETIME, lasttime DATETIME)");
+                "hash TEXT, salt TEXT, regtime DATETIME, lasttime DATETIME)",
+                function(err, result) {});
         db.run("CREATE TABLE Items (id INTEGER PRIMARY KEY,username TEXT," +
                 "media_url TEXT,title TEXT,description TEXT," +
-                "link TEXT,time DATETIME)");
+                "link TEXT,time DATETIME)", function(err, result) {});
         db.run("CREATE TABLE ExtFeeds (id INTEGER PRIMARY KEY, username TEXT," +
-                "url TEXT, title TEXT)");
+                "url TEXT, title TEXT)", function(err, result) {});
         // Create default user
-        var username = process.env.PPFEED_DEFAULT_USERNAME || 'jukka';
+        var username = process.env.PPFEED_DEFAULT_USERNAME || 'j';
         var password = process.env.PPFEED_DEFAULT_PASSWORD || 'js';
         hash.hash(password, function (err, hash, salt) {
             addUser(username, hash, salt);
