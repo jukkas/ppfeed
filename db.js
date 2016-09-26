@@ -1,12 +1,14 @@
 'use strict';
 
+var bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 var dataDir = process.env.PPFEED_DATA_DIR ||
                 process.env.OPENSHIFT_DATA_DIR || __dirname;
 
 var debug = require('debug')('ppfeed')
 var path = require('path');
 var fs = require("fs");
-var hash = require('./routes/hash'); // For hash
 
 var dbFile = path.join(dataDir, 'ppfeed.db');
 var dbExists = fs.existsSync(dbFile);
@@ -15,12 +17,12 @@ var sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database(dbFile);
 
 
-var addUser = function(username, hash, salt, callback) {
+var addUser = function(username, hash, callback) {
     var time = new Date().toISOString();
     var sql = 'INSERT INTO Users'+
-              '(username, hash, salt, regtime, lasttime) VALUES '+
-              '(?, ?, ?, ?, ?)';
-    db.run(sql, username, hash, salt, time, time, callback,
+              '(username, hash, regtime, lasttime) VALUES '+
+              '(?, ?, ?, ?)';
+    db.run(sql, username, hash, time, time, callback,
         function(err, result) {});
 }
 
@@ -28,7 +30,7 @@ var addUser = function(username, hash, salt, callback) {
 db.serialize(function() {
     if(!dbExists) {
         db.run("CREATE TABLE Users (username TEXT NOT NULL UNIQUE," +
-                "hash TEXT, salt TEXT, regtime DATETIME, lasttime DATETIME)",
+                "hash TEXT, regtime DATETIME, lasttime DATETIME)",
                 function(err, result) {});
         db.run("CREATE TABLE Items (id INTEGER PRIMARY KEY,username TEXT," +
                 "media_url TEXT,title TEXT,description TEXT," +
@@ -36,11 +38,10 @@ db.serialize(function() {
         db.run("CREATE TABLE ExtFeeds (id INTEGER PRIMARY KEY, username TEXT," +
                 "url TEXT, title TEXT)", function(err, result) {});
         // Create default user
-        var username = process.env.PPFEED_DEFAULT_USERNAME || 'j';
+        var username = process.env.PPFEED_DEFAULT_USERNAME || 'jukka';
         var password = process.env.PPFEED_DEFAULT_PASSWORD || 'js';
-        hash.hash(password, function (err, hash, salt) {
-            addUser(username, hash, salt);
-        });
+        var hash = bcrypt.hashSync(password, saltRounds);
+        addUser(username, hash);
     }
 });
 

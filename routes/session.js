@@ -1,3 +1,6 @@
+'use strict';
+var bcrypt = require('bcrypt');
+const saltRounds = 10;
 var db = require('../db');
 var hash = require('./hash');
 
@@ -7,7 +10,7 @@ exports.ensureLoggedIn = function(req, res, next) {
     } else {
         res.redirect('/');
     }
-}
+};
 
 exports.ensurePersonal = function(req, res, next) {
     // Logged in user may only access their own page
@@ -16,7 +19,7 @@ exports.ensurePersonal = function(req, res, next) {
     } else {
         res.redirect('/');
     }
-}
+};
 
 exports.login = function(req, res) {
     if (!req.body.uname || !req.body.pword) {
@@ -32,8 +35,8 @@ exports.login = function(req, res) {
             console.log('Login failure: unknown username:', req.body.uname);
             return res.redirect('/');
         }
-        hash.hash(req.body.pword, result[0].salt, function (err, ohash) {
-            if (ohash != result[0].hash) {
+        bcrypt.compare(req.body.pword, result[0].hash, function(err, matches) {
+            if (!matches) {
                 console.log('Login failure: incorrect password for ',
                         req.body.uname);
                 return res.redirect('/');
