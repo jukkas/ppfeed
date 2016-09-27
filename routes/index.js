@@ -22,9 +22,10 @@ router.get('/ppfeed.png', function(req, res) {
 router.post('/login', session.login);
 router.get('/logout', session.logout);
 
-//Disabled for now
-//router.get('/register', user.register);
-//router.post('/register', user.newUser);
+router.get('/register', function(req, res) {
+    res.render('register', { title: 'Register to ppfeed' });
+});
+router.post('/register', session.register);
 
 router.post('/delete', session.ensureLoggedIn, feed.deleteitem);
 router.post('/add', session.ensureLoggedIn, feed.additem);

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ title }}</title>
+
+	<link href="stylesheets/login.css" rel="stylesheet">
+  </head>
+  <body>
+  <script>
+    function passwordMatch() {
+        var pword = document.getElementById("pword").value;
+        var pword2 = document.getElementById("pword2").value;
+        return pword===pword2;
+    }
+  </script>
+    <div>
+        <form class="login-form" role="form" action="/register" method="post"
+            onsubmit="return passwordMatch()">
+          <h1>Please register</h1>
+          <input name="uname" class="form-control" placeholder="Username" required="" autofocus="" type="text">
+          <input id="pword" name="pword" class="form-control" placeholder="Password" required="" type="password">
+          <input id="pword2" name="pword2" class="form-control" placeholder="Password (again)" required="" type="password">
+          <button class="submit-button" type="submit">
+  			Register
+  		</button>
+        </form>
+    </div>
+  </body>
+</html>

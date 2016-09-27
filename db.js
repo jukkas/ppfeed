@@ -17,18 +17,18 @@ var sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database(dbFile);
 
 
-var addUser = function(username, hash, callback) {
+exports.addUser = function(username, hash, callback) {
     var time = new Date().toISOString();
     var sql = 'INSERT INTO Users'+
               '(username, hash, regtime, lasttime) VALUES '+
               '(?, ?, ?, ?)';
-    db.run(sql, username, hash, time, time, callback,
-        function(err, result) {});
+    db.run(sql, username, hash, time, time, callback);
 }
 
 
 db.serialize(function() {
     if(!dbExists) {
+        console.log('Database not found. Creating...');
         db.run("CREATE TABLE Users (username TEXT NOT NULL UNIQUE," +
                 "hash TEXT, regtime DATETIME, lasttime DATETIME)",
                 function(err, result) {});
@@ -37,11 +37,13 @@ db.serialize(function() {
                 "link TEXT,time DATETIME)", function(err, result) {});
         db.run("CREATE TABLE ExtFeeds (id INTEGER PRIMARY KEY, username TEXT," +
                 "url TEXT, title TEXT)", function(err, result) {});
+        db.run("CREATE TABLE Settings (key NOT NULL UNIQUE, value TEXT)",
+                                        function(err, result) {});
         // Create default user
         var username = process.env.PPFEED_DEFAULT_USERNAME || 'jukka';
         var password = process.env.PPFEED_DEFAULT_PASSWORD || 'js';
         var hash = bcrypt.hashSync(password, saltRounds);
-        addUser(username, hash);
+        exports.addUser(username, hash);
     }
 });
 
