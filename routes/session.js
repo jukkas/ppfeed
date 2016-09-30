@@ -2,8 +2,8 @@
 var bcrypt = require('bcrypt');
 const saltRounds = 10;
 var db = require('../db');
-//var expressValidator = require('express-validator');
 
+// Custom validator for express-validator: reserve some usernames
 exports.customValidators = {
     customValidators: {
         isNotPreReserved: function(username) {
