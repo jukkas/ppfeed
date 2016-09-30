@@ -91,8 +91,6 @@ exports.additem = function (req, res) {
     if (req.body.link)
         req.checkBody('link', 'Invalid link').optional()
             .isURL({ allow_underscores: true, allow_trailing_dot:true });
-    req.sanitize('title').escape();
-    req.sanitize('description').escape();
 
     let errors = req.validationErrors();
     if (errors) {
