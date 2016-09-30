@@ -1,8 +1,5 @@
 'use strict';
 
-var bcrypt = require('bcrypt');
-const saltRounds = 10;
-
 var dataDir = process.env.PPFEED_DATA_DIR ||
                 process.env.OPENSHIFT_DATA_DIR || __dirname;
 
@@ -39,8 +36,6 @@ db.serialize(function() {
                 "url TEXT, title TEXT)", function(err, result) {});
         db.run("CREATE TABLE Settings (key NOT NULL UNIQUE, value TEXT)",
                                         function(err, result) {});
-        var hash = bcrypt.hashSync(password, saltRounds);
-        exports.addUser(username, hash);
     }
 });
 
