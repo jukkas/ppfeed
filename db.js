@@ -39,9 +39,6 @@ db.serialize(function() {
                 "url TEXT, title TEXT)", function(err, result) {});
         db.run("CREATE TABLE Settings (key NOT NULL UNIQUE, value TEXT)",
                                         function(err, result) {});
-        // Create default user
-        var username = process.env.PPFEED_DEFAULT_USERNAME || 'jukka';
-        var password = process.env.PPFEED_DEFAULT_PASSWORD || 'js';
         var hash = bcrypt.hashSync(password, saltRounds);
         exports.addUser(username, hash);
     }

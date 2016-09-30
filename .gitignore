@@ -1,5 +1,5 @@
 *~
 node_modules
-ppfeed.db
+*.db
 *.old
 npm-debug.log
