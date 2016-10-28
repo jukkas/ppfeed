@@ -14,6 +14,7 @@ var sessionRoute = require('./routes/session');
 
 var app = express();
 
+app.disable('x-powered-by');
 // view engine setup
 app.engine('html', swig.renderFile);
 app.set('views', path.join(__dirname, 'views'));
