@@ -18,62 +18,31 @@ exports.items = function (req, res) {
 exports.xml = function (req, res) {
     db.getUserItems(req.params.user, function (items) {
         if (items && items.length > 0) {
-            var channelTitle = 'Personal Podcast Feed for ' + req.params.user;
-            var channelLink = 'http://example.com'; //TODO: from config
-            if (req.headers.host)
-                channelLink = 'http://' + req.headers.host;
-            var channelImage = channelLink + '/ppfeed.png'; //TODO: from config
-
-            res.writeHead(200, {
-                "Content-Type": "application/rss+xml; charset=utf-8"
-            });
-            res.write('<?xml version="1.0" encoding="UTF-8"?>\n');
-            res.write('<rss version="2.0">\n');
-            res.write('<channel>\n  <title>' + channelTitle + '</title>\n');
-            res.write('  <description>Personal feed of podcast episodes</description>\n');
-            res.write('  <link>' + channelLink + '</link>\n');
-            res.write('  <image>\n');
-            res.write('    <title>' + channelTitle + '</title>\n');
-            res.write('    <link>' + channelLink + '</link>\n');
-            res.write('    <url>' + channelImage + '</url>\n');
-            res.write('  </image>\n');
-            for (var r = 0; r < items.length; r++) {
-                res.write('  <item>\n');
-                res.write('    <title>');
-                res.write(entities.encode(items[r].title));
-                res.write('</title>\n');
-                if (items[r].link && items[r].link.length > 0) {
-                    res.write('    <link><![CDATA[');
-                    res.write(items[r].link);
-                    res.write(']]></link>\n');
-                }
-                res.write('    <guid>');
-                res.write(items[r].media_url.replace('&','_'));
-                res.write('</guid>\n');
-                res.write('    <description><![CDATA[');
-                res.write(items[r].description ? entities.encode(items[r].description) : ' ');
-                res.write(']]></description>\n');
-                res.write('    <enclosure url="');
-                let url = items[r].media_url;
-                res.write(url);
-                if (url.endsWith('.ogg') || url.endsWith('.oga')) {
-                    res.write('" length="0" type="audio/ogg" />\n');
+            let channelLink = 'http://' + (req.headers.host || 'localhost');
+            let channelImage = channelLink + '/ppfeed.png'; //TODO: from config
+            items.forEach(item => {
+                if (item.media_url.endsWith('.ogg') ||
+                    item.media_url.endsWith('.oga') ||
+                    item.media_url.indexOf('.ogg?') != -1 ||
+                    item.media_url.indexOf('.oga?') != -1) {
+                        item.media_url_type = 'audio/ogg';
                 } else {
-                    res.write('" length="0" type="audio/mpeg" />\n');
+                        item.media_url_type = 'audio/mpeg';
                 }
-                res.write('    <category>Podcasts</category>\n');
-                var pubDate = moment(items[r].time);
-                res.write('    <pubDate>');
-                res.write(pubDate.format('ddd, D MMM YYYY HH:mm:ss ZZ'));
-                //res.write(items[r].time.toString() || ' ');
-                res.write('</pubDate>\n');
-                res.write('  </item>\n');
-            }
-            res.write('</channel>\n</rss>\n');
+                let pubDate = moment(item.time);
+                item.pubDate = pubDate.format('ddd, D MMM YYYY HH:mm:ss ZZ');
+                item.guid = item.media_url.replace('&','_');
+            });
+            res.set('Content-Type', 'application/rss+xml; charset=utf-8');
+            res.render('xml', {
+                channelTitle: 'Personal Podcast Feed for ' + req.params.user,
+                channelLink: channelLink,
+                channelImage: channelImage,
+                items: items
+            });
         } else {
-            res.send(404, 'No matches!\n');
+            res.status(404).send('No podcasts!\n');
         }
-        res.end();
     });
 };
 

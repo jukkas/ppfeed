@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>{{channelTitle}}</title>
+    <description>Personal feed of podcast episodes</description>
+    <link>{{channelLink}}</link>
+    <image>
+      <title>{{channelTitle}}</title>
+      <link>{{channelLink}}</link>
+      <url>{{channelImage}}</url>
+    </image>
+    {% for item in items %}
+    <item>
+      <title>{{item.title}}</title>
+      {% if item.link %}<link><![CDATA[{{item.link}}]]></link>{% endif %}
+      <guid>{{item.guid}}</guid>
+      <description><![CDATA[{{item.description}}]]></description>
+      <enclosure url="{{item.media_url}}" length="0" type="{{item.media_url_type}}" />
+      <category>Podcasts</category>
+      <pubDate>{{item.pubDate}}</pubDate>
+    </item>
+    {% endfor %}
+  </channel>
+</rss>

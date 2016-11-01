@@ -44,8 +44,6 @@ router.post('/extfeeds/:id', session.ensureLoggedIn, extfeed.addToPPFeed);
 
 /* Personal feeds */
 router.get('/:user', session.ensureLoggedIn, session.ensurePersonal, feed.items);
-
 router.get('/:user/rss', feed.xml);
-
 
 module.exports = router;
