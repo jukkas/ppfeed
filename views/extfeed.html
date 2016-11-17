@@ -12,7 +12,8 @@
 {% if meta.image %}<img id="feed-image" src="{{meta.image.url}}">{% endif %}
 {{ meta.description }}
 {% if meta.link %}<br><a href="{{meta.link}}">{{meta.link}}</a>{% endif %}
-<h1>Items</h1>
+
+<h2 class="clear">Episodes</h1>
 <table>
 {% for item in items %}
 	<tr>
@@ -25,17 +26,17 @@
 			<form name="addtoppfeed" method="post">
 				<!-- TODO: RESTify  -->
 				<input type="hidden" name="guid", value="{{item.guid}}">
-				<input type="submit" value="Add" class="deletebtn" title="Add item">
+				<input type="submit" value="Add" class="addbtn" title="Add episode">
 			</form>
 		</td>
 	</tr>
 {% endfor %}
 
 </table>
-<br>
-<div>
+
+<nav>
 <a href="../extfeeds">External feeds</a> <a href="/logout">Logout</a>
-</div>
+</nav>
 
 </body>
 

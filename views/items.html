@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<h2>Add new</h2>
+<h2>Add new episode</h2>
 <div id="newitem">
     <form class="newitem" name="newitem" action="/add" method="post">
       <div>
@@ -27,13 +27,14 @@
         <label for="link">Link</label>
         <input type="text" id="link" name="link">
       </div>
-      <div class="newitembutton">
+      <div>
+        <label></label>
         <button type="submit">Add</button>
       </div>
     </form>
 </div>
 <br>
-<h2>Items</h2>
+<h2>Episodes</h2>
 <table class="episode-list">
 {% for item in items %}
     <tr>
@@ -46,17 +47,17 @@
             <form name="delete" action="/delete" method="post">
                 <!-- TODO: RESTify  -->
                 <input type="hidden" name="item", value="{{item.id}}">
-                <input type="submit" value="Delete" class="deletebtn" title="Remove item">
+                <input type="submit" value="Delete" class="deletebtn" title="Remove episode">
             </form>
         </td>
     </tr>
 {% endfor %}
 
 </table>
-<br>
-<div>
+
+<nav>
 <a href="extfeeds">External feeds</a> <a href="/logout">Logout</a>
-</div>
+</nav>
 
 </body>
 
