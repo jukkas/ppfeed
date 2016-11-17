@@ -22,7 +22,7 @@ function cleanCache() {
 exports.feeds = function (req, res) {
     res.clearCookie('error');
     db.getExtFeeds(req.session.username, function (err, feeds) {
-        let errorMsg = req.cookies.error;
+        let errorMsg = req.cookies ? req.cookies.error:null;
         if (err) errorMsg = err.message;
         res.render('extfeeds', {
             title: 'External feeds for ' + req.session.username,
