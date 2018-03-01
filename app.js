@@ -32,7 +32,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Cookie based session
 app.use(session({
     name: 'SES',
-    secret: process.env.PPFEED_SESSION_SECRET || '5dx`h2}K*mA86<V4'
+    secret: process.env.PPFEED_SESSION_SECRET || '5dx`h2}K*mA86<V4',
+    sameSite: 'strict'
 }))
 
 // Routes

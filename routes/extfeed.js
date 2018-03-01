@@ -43,6 +43,7 @@ exports.deleteFeed = function (req, res) {
 // Add new external feed
 exports.addFeed = function (req, res) {
     if (!req.body.url || !req.body.url.startsWith('http')) {
+        console.log('addFeed: Invalid url '+req.body.url);
         res.cookie('error','Invalid url '+req.body.url);
         return res.redirect('extfeeds');
     }
