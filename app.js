@@ -33,7 +33,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     name: 'SES',
     secret: process.env.PPFEED_SESSION_SECRET || '5dx`h2}K*mA86<V4',
-    sameSite: 'strict'
+    sameSite: 'strict',
+    maxAge: 365 * 24 * 60 * 60 * 1000   // 365 days
 }))
 
 // Routes

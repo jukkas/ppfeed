@@ -1,0 +1,2 @@
+- Investigate error adding http://makingembeddedsystems.libsyn.com/rss
+- Description tooltip fix: if HTML -> txt (npm install html-to-text)
