@@ -11,7 +11,7 @@
   "author": "Jukka S <jukkas@gmail.com>",
   "license": "proprietary",
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^3.0.0",
     "body-parser": "^1.18.2",
     "cookie-session": "^2.0.0-beta.3",
     "debug": "^3.1.0",
@@ -19,17 +19,18 @@
     "express-validator": "^5.0.2",
     "feedparser": "^2.2.9",
     "html-entities": "^1.2.1",
+    "html-to-text": "^4.0.0",
     "moment": "^2.20.1",
     "morgan": "^1.9.0",
     "request": "^2.83.0",
     "serve-favicon": "^2.4.5",
-    "sqlite3": "^3.1.13",
+    "sqlite3": "^4.0.2",
     "swig-templates": "^2.0.2"
   },
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "ssh://j@app.sikamo.net/home/j/git/ppfeed"
+    "url": "ssh://j@sikamo.net/home/j/git/ppfeed"
   },
   "keywords": [
     "personal",

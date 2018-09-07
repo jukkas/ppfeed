@@ -1,12 +1,17 @@
 "use strict";
-var db = require('../db');
-var moment = require('moment');
-var Entities = require('html-entities').XmlEntities;
-var entities = new Entities();
-var debug = require('debug')('ppfeed')
+const htmlToText = require('html-to-text');
+const db = require('../db');
+const moment = require('moment');
+const Entities = require('html-entities').XmlEntities;
+const entities = new Entities();
+const debug = require('debug')('ppfeed')
 
 exports.items = function (req, res) {
     db.getUserItems(req.params.user, function (items) {
+        items.forEach(item => {
+            if (item.description.includes('<') && item.description.includes('>'))
+               item.description = htmlToText.fromString(item.description);
+        });
         res.render('items', {
             title: 'Personal feed for ' + req.params.user,
             user: req.params.user,
