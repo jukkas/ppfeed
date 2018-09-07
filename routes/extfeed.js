@@ -1,12 +1,13 @@
 'use strict';
-var db = require('../db');
-var moment = require('moment');
-var request = require('request');
-var FeedParser = require('feedparser');
-var debug = require('debug')('ppfeed')
+const htmlToText = require('html-to-text');
+const db = require('../db');
+const moment = require('moment');
+const request = require('request');
+const FeedParser = require('feedparser');
+const debug = require('debug')('ppfeed')
 
 
-var cache = new Map();
+const cache = new Map();
 
 // Expire from cache all downloads older than 60 minutes
 function cleanCache() {
@@ -141,6 +142,8 @@ exports.getFeed = function (req, res) {
             var item;
 
             while (item = stream.read()) {
+                if (item.description.includes('<') && item.description.includes('>'))
+                    item.description = htmlToText.fromString(item.description);
                 feed.items.push(item);
             }
 
