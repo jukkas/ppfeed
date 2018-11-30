@@ -31,7 +31,9 @@
 		</td>
 	</tr>
 {% endfor %}
-
+{% if error %}
+<div>{{error}}</div>
+{% endif %}
 </table>
 
 <nav>

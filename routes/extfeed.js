@@ -131,7 +131,7 @@ exports.getFeed = function (req, res) {
         r.on('response', function (resp) {
             var stream = this;
             if (resp.statusCode != 200)
-                return done(new Error('Bad status code'));
+                return done(new Error(`Bad status code ${resp.statusCode}`));
             stream.pipe(feedparser);
         });
 
