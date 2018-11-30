@@ -45,6 +45,8 @@ app.get('/health', function (req, res) {
 app.use('/', routes);
 
 // Start server
-app.listen(process.env.NODE_PORT || 3000, process.env.NODE_IP || 'localhost', function() {
-    console.log('Express server running at port', process.env.NODE_PORT || 3000);
+app.set('port', process.env.PORT || 3003);
+app.set('address', process.env.NODE_IP || 'localhost');
+app.listen(app.get('port'), app.get('address'), function() {
+    console.log(`Express server running: http://${app.get('address')}:${app.get('port')}`);
 });
