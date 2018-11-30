@@ -6,28 +6,30 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "DEBUG=ppfeed nodemon app.js"
   },
   "author": "Jukka S <jukkas@gmail.com>",
   "license": "proprietary",
   "dependencies": {
-    "bcrypt": "^3.0.0",
-    "body-parser": "^1.18.2",
+    "bcrypt": "^3.0.2",
+    "body-parser": "^1.18.3",
     "cookie-session": "^2.0.0-beta.3",
-    "debug": "^3.1.0",
-    "express": "^4.16.2",
-    "express-validator": "^5.0.2",
+    "debug": "^4.1.0",
+    "express": "^4.16.4",
+    "express-validator": "^5.3.0",
     "feedparser": "^2.2.9",
     "html-entities": "^1.2.1",
     "html-to-text": "^4.0.0",
-    "moment": "^2.20.1",
-    "morgan": "^1.9.0",
-    "request": "^2.83.0",
-    "serve-favicon": "^2.4.5",
-    "sqlite3": "^4.0.2",
-    "swig-templates": "^2.0.2"
+    "moment": "^2.22.2",
+    "morgan": "^1.9.1",
+    "request": "^2.88.0",
+    "serve-favicon": "^2.5.0",
+    "sqlite3": "^4.0.4",
+    "swig-templates": "^2.0.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^1.18.7"
+  },
   "repository": {
     "type": "git",
     "url": "ssh://j@sikamo.net/home/j/git/ppfeed"
