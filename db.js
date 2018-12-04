@@ -1,28 +1,17 @@
-'use strict';
-
-var dataDir = process.env.PPFEED_DATA_DIR ||
+const dataDir = process.env.PPFEED_DATA_DIR ||
                 process.env.OPENSHIFT_DATA_DIR || __dirname;
 
-var debug = require('debug')('ppfeed')
-var path = require('path');
-var fs = require("fs");
+const debug = require('debug')('ppfeed')
+const path = require('path');
+const fs = require("fs");
 
-var dbFile = path.join(dataDir, 'ppfeed.db');
-var dbExists = fs.existsSync(dbFile);
+const dbFile = path.join(dataDir, 'ppfeed.db');
+const dbExists = fs.existsSync(dbFile);
 
-var sqlite3 = require("sqlite3").verbose();
-var db = new sqlite3.Database(dbFile);
+const sqlite3 = require("sqlite3").verbose();
+const db = new sqlite3.Database(dbFile);
 
-
-exports.addUser = function(username, hash, callback) {
-    var time = new Date().toISOString();
-    var sql = 'INSERT INTO Users'+
-              '(username, hash, regtime, lasttime) VALUES '+
-              '(?, ?, ?, ?)';
-    db.run(sql, username, hash, time, time, callback);
-}
-
-
+// Init
 db.serialize(function() {
     if(!dbExists) {
         console.log('Database not found. Creating...');
@@ -39,63 +28,113 @@ db.serialize(function() {
     }
 });
 
-exports.getUser = function(username, callback) {
-    db.all('SELECT * FROM Users WHERE username = ?', username, callback);
+
+const dbAll = (sql, ...args) => {
+    return new Promise((resolve, reject) => {
+        // With method 'run' we get lastID, with 'all' we get rows
+        let method = sql.toLowerCase().startsWith('select') ? 'all':'run';
+        db[method](sql, args, (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (method === 'run')
+                resolve(this.lastID);
+            else
+                resolve(rows);
+        });
+    });
 }
 
-exports.getUserItems = function(username, callback) {
-   db.all('SELECT id, media_url, title, description, link, time '+
-          'FROM Items WHERE username = ? ORDER BY id DESC', username,
-          function(err, rows) {
-              if (err) {
-                  console.log(err);
-              }
-              callback(rows);
-          });
+const dbGetFirst = (sql, ...args) => {
+    return new Promise((resolve, reject) => {
+        db.get(sql, args, (err, row) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(row);
+        });
+    });
 }
 
-exports.deleteItem = function(id, user) {
-    if (id && user) {
-        debug('DELETE FROM Items WHERE id='+id,'AND username='+user);
-        db.run('DELETE FROM Items WHERE id=? AND username=?', id, user);
-    }
+
+const addUser = ({username, hash}) => {
+    const time = new Date().toISOString();
+    const sql = 'INSERT INTO Users' +
+                '(username, hash, regtime, lasttime) VALUES ' +
+                '(?, ?, ?, ?)';
+    return dbAll(sql, username, hash, time, time);
 }
 
-exports.addItem = function(username, media_url, title, description, link) {
+const getUser = username => {
+    return dbGetFirst('SELECT * FROM Users WHERE username = ?', username);
+}
+
+const getUserItems = username => {
+    
+    return dbAll('SELECT id, media_url, title, description, link, time ' +
+                'FROM Items WHERE username = ? ORDER BY id DESC', username);
+}
+
+// TODO: test error case
+const deleteItem = ({id, username}) => {
+    if (!id || !username)
+        return;
+    debug('DELETE FROM Items WHERE id='+id,'AND username='+username);
+    return dbAll('DELETE FROM Items WHERE id=? AND username=?', id, username);
+}
+
+// TODO: better error handling
+const addItem = ({username, media_url, title, description, link}) => {
         if (username && media_url && title) {
                 description = description || " ";
-                var currentTime = new Date();
-                var time = currentTime.toISOString();
-                var sql = 'INSERT INTO Items'+
-                  '(username, media_url, title, description, link, time) VALUES '+
+                const currentTime = new Date();
+                //const time = currentTime.toISOString();
+                const sql = 'INSERT INTO Items' +
+                  '(username, media_url, title, description, link, time) VALUES ' +
                   '(?, ?, ?, ?, ?, ?)';
             debug(sql, username, media_url, title,
                 description.substring(0, 20)+'...', link, currentTime);
-            db.run(sql, username, media_url, title, description, link, currentTime);
-    }
+            return dbAll(sql, username, media_url, title, description, link, currentTime);
+        }
+        return;
 }
 
-exports.getExtFeeds = function(username, callback) {
-    db.all('SELECT * FROM ExtFeeds WHERE username=?', username, callback);
+const getExtFeeds = username => {
+    return dbAll('SELECT * FROM ExtFeeds WHERE username=?', username);
 }
 
-exports.deleteExtFeed = function(id, user, callback) {
+const deleteExtFeed = ({id, username}) => {
     if (id && user) {
-        debug('DELETE FROM ExtFeeds WHERE id='+id+' AND username='+user);
-        db.run('DELETE FROM ExtFeeds WHERE id=? AND username=?', id, user, callback);
+        debug('DELETE FROM ExtFeeds WHERE id='+id+' AND username='+username);
+        return dbAll('DELETE FROM ExtFeeds WHERE id=? AND username=?', id, username);
     }
+    return;
 }
 
-exports.addExtFeed = function(username, url, title, callback) {
+const addExtFeed = ({username, url, title}) => {
     if (username && url && title) {
-        var sql = 'INSERT INTO ExtFeeds'+
-                '(username, url, title) VALUES '+
+        const sql = 'INSERT INTO ExtFeeds' +
+                '(username, url, title) VALUES ' +
                 '(?, ?, ?)';
         debug(sql, username, url, title);
-        db.run(sql, username, url, title, callback);
+        return dbAll(sql, username, url, title);
     }
+    return;
 }
 
-exports.getExtFeed = function(id, callback) {
-    db.all('SELECT * FROM ExtFeeds WHERE id = ?', id, callback);
+const getExtFeed = id => {
+    return dbAll('SELECT * FROM ExtFeeds WHERE id = ?', id);
 }
+
+module.exports = {
+    addUser,
+    addItem,
+    getUser,
+    getUserItems,
+    deleteItem,
+    getExtFeeds,
+    deleteExtFeed,
+    addExtFeed,
+    getExtFeed
+};

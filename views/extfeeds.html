@@ -41,7 +41,7 @@
 </table>
 <br>
 <h2>Add new</h2>
-{% if error %}<div class="error">{{ error }}</div>{% endif %}
+{% if error %}<div class="error">{{ error.message }}</div>{% endif %}
 <div id="newitem">
 	<form name="newextfeed" action="extfeeds" method="post">
 		<label for="url">URL</label>

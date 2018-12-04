@@ -22,14 +22,21 @@ function cleanCache() {
 // Render external feeds of a user
 exports.feeds = function (req, res) {
     res.clearCookie('error');
-    db.getExtFeeds(req.session.username, function (err, feeds) {
-        let errorMsg = req.cookies ? req.cookies.error:null;
-        if (err) errorMsg = err.message;
+    db.getExtFeeds(req.session.username)
+    .then(feeds => {
         res.render('extfeeds', {
             title: 'External feeds for ' + req.session.username,
             user: req.session.username,
-            error: errorMsg,
-            feeds: feeds
+            error: req.cookies ? req.cookies.error:null,
+            feeds: feeds,
+        });
+    })
+    .catch(err => {
+        res.render('extfeeds', {
+            title: 'External feeds for ' + req.session.username,
+            user: req.session.username,
+            error: err,
+            feeds: [],
         });
     });
 };
@@ -37,7 +44,8 @@ exports.feeds = function (req, res) {
 // Delete external feed
 exports.deleteFeed = function (req, res) {
     debug('Deleting feed' + req.params.id);
-    db.deleteExtFeed(req.params.id, req.session.username);
+    db.deleteExtFeed({id: req.params.id, username: req.session.username})
+    .catch(err => console.log(err));
     res.redirect('..');
 };
 
@@ -74,11 +82,14 @@ exports.addFeed = function (req, res) {
             res.cookie('error',err.message);
             return res.redirect('extfeeds');
         }
-        if (meta.title)
-            db.addExtFeed(req.session.username, req.body.url, meta.title,
-                        function(err, result) {
-                            debug('addfeed: added lastID:',this.lastID);
-                        });
+        if (meta.title) {
+            db.addExtFeed({
+                username: req.session.username,
+                url: req.body.url,
+                title: meta.title
+            })
+            .catch(err => console.log(err));
+        }
         res.redirect('extfeeds');
     }
 };
@@ -97,8 +108,14 @@ exports.addToPPFeed = function (req, res) {
             let enclosure = item.enclosures.find(enc => enc.type && enc.type.startsWith('audio'));
             if (enclosure && enclosure.url) {
                 debug('Adding new item to personal feed:', item.title);
-                db.addItem(req.session.username, enclosure.url, item.title,
-                    item.description, item.link);
+                db.addItem({
+                    username: req.session.username,
+                    media_url: enclosure.url,
+                    title: item.title,
+                    description: item.description,
+                    link: item.link
+                })
+                .catch(err => console.log(err));
             }
         } else {
             console.warn('Error: guid not found:', req.body.guid);
@@ -110,39 +127,39 @@ exports.addToPPFeed = function (req, res) {
 };
 
 // Get single external feed from cache or download it + render it
-exports.getFeed = function (req, res) {
+exports.getFeed = async function (req, res) {
 
     cleanCache();
 
     if (cache.get(req.params.id)) {
+        console.log('@@getfeed,cached');
         return res.render('extfeed', cache.get(req.params.id));
-    } else {
-        debug('Downloading feed');
-        db.getExtFeed(req.params.id, downloadFeed);
     }
-    function downloadFeed(err, feedArr) {
+    
+    try {
+        const feedArr = await db.getExtFeed(req.params.id);
         var feed = {meta: {}, items: []};
-        if (err || !feedArr || feedArr.length != 1)
-            return done();
+        if (!feedArr || feedArr.length != 1)
+            throw new Error('Feed not found');
 
-        var r = request(feedArr[0].url);
-        var feedparser = new FeedParser();
+        let r = request(feedArr[0].url);
+        let feedparser = new FeedParser();
         r.on('error', done);
         r.on('response', function (resp) {
             var stream = this;
-            if (resp.statusCode != 200)
+            if (resp.statusCode < 200 || resp.statusCode >= 300)
                 return done(new Error(`Bad status code ${resp.statusCode}`));
             stream.pipe(feedparser);
         });
 
-        feedparser.on('error', done);
+        feedparser.on('error', parseErr);
         feedparser.on('end', done);
         feedparser.on('readable', function() {
-            var stream = this;
-            var item;
+            let stream = this;
+            let item;
 
             while (item = stream.read()) {
-                if (item.description.includes('<') && item.description.includes('>'))
+                if (item.description && item.description.includes('<') && item.description.includes('>'))
                     item.description = htmlToText.fromString(item.description);
                 feed.items.push(item);
             }
@@ -150,8 +167,13 @@ exports.getFeed = function (req, res) {
             feed.meta = this.meta;
         });
 
+        function parseErr(err) {
+            feed.error = err;
+        }
+
         function done(err) {
-             if (err) {
+            err = err || feed.error;
+            if (err) {
                 console.log(err, err.stack);
                 return res.render('extfeed', {error: err});
             }
@@ -159,5 +181,9 @@ exports.getFeed = function (req, res) {
             cache.set(req.params.id, feed);
             return res.render('extfeed', feed);
         }
+
+    } catch (err) {
+        console.log(err, err.stack);
+        return res.render('extfeed', {error: err});
     }
 };

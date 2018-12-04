@@ -1,2 +1,5 @@
-
+- refactor express/controller/services
+- :user/rss: return only first 20 by default, ?all returns all
+- session.js: register error messages to UI
+- UI needs redesign
 

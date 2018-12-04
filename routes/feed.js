@@ -6,8 +6,11 @@ const Entities = require('html-entities').XmlEntities;
 const entities = new Entities();
 const debug = require('debug')('ppfeed')
 
-exports.items = function (req, res) {
-    db.getUserItems(req.params.user, function (items) {
+exports.items = async function (req, res) {
+
+    try {
+        const items = await db.getUserItems(req.params.user);
+        // Convert description from HTML to text (for UI tooltips)
         items.forEach(item => {
             if (item.description.includes('<') && item.description.includes('>'))
                item.description = htmlToText.fromString(item.description);
@@ -17,11 +20,19 @@ exports.items = function (req, res) {
             user: req.params.user,
             items: items
         });
-    });
+    } catch (error) {
+        res.render('error',{
+            message: 'Error getting user items',
+            error
+        });
+    }
 };
 
-exports.xml = function (req, res) {
-    db.getUserItems(req.params.user, function (items) {
+exports.xml = async function (req, res) {
+
+    try {
+        const items = await db.getUserItems(req.params.user);
+
         if (items && items.length > 0) {
             let channelLink = 'http://' + (req.headers.host || 'localhost');
             let channelImage = channelLink + '/ppfeed.png'; //TODO: from config
@@ -48,12 +59,18 @@ exports.xml = function (req, res) {
         } else {
             res.status(404).send('No podcasts!\n');
         }
-    });
+    } catch (error) {
+        res.render('error',{
+            message: 'Error getting user items',
+            error
+        });
+    }
 };
 
 exports.deleteitem = function (req, res) {
     debug('req.body.item=' + req.body.item);
-    db.deleteItem(req.body.item, req.session.username);
+    db.deleteItem({id: req.body.item, username: req.session.username})
+    .catch(err => console.error(err));
     res.redirect('../' + req.session.username);
 };
 
@@ -73,7 +90,14 @@ exports.additem = function (req, res) {
         return;
     };
 
-    db.addItem(req.session.username, req.body.url, req.body.title,
-        req.body.description, req.body.link);
+    db.addItem({
+        username: req.session.username,
+        media_url:req.body.url,
+        title:req.body.title,
+        description:req.body.description,
+        link: req.body.link
+    })
+    .catch(err => console.error(err));
+
     res.redirect('../' + req.session.username);
 };

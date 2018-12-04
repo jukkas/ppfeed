@@ -1,7 +1,7 @@
 'use strict';
-var bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
-var db = require('../db');
+const db = require('../db');
 
 // Custom validator for express-validator: reserve some usernames
 exports.customValidators = {
@@ -30,7 +30,7 @@ exports.ensurePersonal = function(req, res, next) {
     }
 };
 
-exports.login = function(req, res) {
+exports.login = async function(req, res) {
     req.checkBody('uname', 'Empty username').notEmpty();
     req.checkBody('pword', 'Empty password').notEmpty();
     if (req.validationErrors()) {
@@ -39,25 +39,25 @@ exports.login = function(req, res) {
         return;
     };
 
-    db.getUser(req.body.uname, function(err, result) {
-        if (err) {
-            console.error('Login db failure:', err);
-            return res.redirect('../');
-        }
-        if (result.length < 1) {
-            console.log('Login failure: unknown username:', req.body.uname);
-            return res.redirect('../');
-        }
-        bcrypt.compare(req.body.pword, result[0].hash, function(err, matches) {
+    const username = req.body.uname;
+    const password = req.body.pword;
+
+    try {
+        const user = await db.getUser(username);
+        if (!user)
+            throw new Error(`Unknown username ${username}`)
+        bcrypt.compare(password, user.hash, (err, matches) => {
             if (!matches) {
-                console.log('Login failure: incorrect password for ',
-                        req.body.uname);
+                console.log('Login failure: incorrect password for ', username);
                 return res.redirect('../');
             }
-            req.session.username = req.body.uname;
-            res.redirect('../'+req.session.username);
-        });
-    });
+            req.session.username = username;
+            res.redirect('../' + username);
+        });        
+    } catch (err) {
+        console.error('Login db failure:', err.message);
+        return res.redirect('../');   
+    }
 };
 
 exports.logout = function(req, res) {
@@ -77,13 +77,15 @@ exports.register = function(req, res) {
         return;
     };
     bcrypt.hash(req.body.pword, saltRounds, function(err, hash) {
-        db.addUser(req.body.uname, hash, function(err) {
-            if (err) {
-                return res.redirect('register');
-            }
+        db.addUser({username: req.body.uname, hash})
+        .then(() => {
             console.log('New user:', req.body.uname);
             req.session.username = req.body.uname;
             res.redirect('../');
-        });
+        })
+        .catch(err => {
+            console.log(err);
+            return res.redirect('register');
+        })
     });
 };
