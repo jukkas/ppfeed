@@ -9,7 +9,7 @@ const debug = require('debug')('ppfeed')
 exports.items = async function (req, res) {
 
     try {
-        const items = await db.getUserItems(req.params.user);
+        const items = await db.getUserItems({username: req.params.user});
         // Convert description from HTML to text (for UI tooltips)
         items.forEach(item => {
             if (item.description.includes('<') && item.description.includes('>'))
@@ -30,8 +30,13 @@ exports.items = async function (req, res) {
 
 exports.xml = async function (req, res) {
 
+    const defaultCount = 20;
+    let limit = parseInt(req.query.count) || defaultCount;   // By default return first 20 items/episodes
+    if ('all' in req.query) { // 'all' query parameter -> return all items/episodes
+        limit = 0;
+    }
     try {
-        const items = await db.getUserItems(req.params.user);
+        const items = await db.getUserItems({username: req.params.user, limit});
 
         if (items && items.length > 0) {
             let channelLink = 'http://' + (req.headers.host || 'localhost');

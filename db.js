@@ -70,10 +70,16 @@ const getUser = username => {
     return dbGetFirst('SELECT * FROM Users WHERE username = ?', username);
 }
 
-const getUserItems = username => {
-    
-    return dbAll('SELECT id, media_url, title, description, link, time ' +
-                'FROM Items WHERE username = ? ORDER BY id DESC', username);
+const getUserItems = ({username, limit}) => {
+
+    let sql = 'SELECT id, media_url, title, description, link, time ' +
+    'FROM Items WHERE username = ? ORDER BY id DESC';
+    let sqlParams = [username];
+    if (limit) {
+        sql += ' LIMIT ?';
+        sqlParams.push(limit);
+    }
+    return dbAll(sql, ...sqlParams);
 }
 
 // TODO: test error case
