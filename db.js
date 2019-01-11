@@ -111,7 +111,7 @@ const getExtFeeds = username => {
 }
 
 const deleteExtFeed = ({id, username}) => {
-    if (id && user) {
+    if (id && username) {
         debug('DELETE FROM ExtFeeds WHERE id='+id+' AND username='+username);
         return dbAll('DELETE FROM ExtFeeds WHERE id=? AND username=?', id, username);
     }
