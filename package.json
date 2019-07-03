@@ -11,24 +11,24 @@
   "author": "Jukka S <jukkas@gmail.com>",
   "license": "proprietary",
   "dependencies": {
-    "bcrypt": "^3.0.2",
-    "body-parser": "^1.18.3",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
     "cookie-session": "^2.0.0-beta.3",
-    "debug": "^4.1.0",
-    "express": "^4.16.4",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
     "express-validator": "^5.3.0",
     "feedparser": "^2.2.9",
     "html-entities": "^1.2.1",
-    "html-to-text": "^4.0.0",
-    "moment": "^2.22.2",
+    "html-to-text": "^5.1.1",
+    "moment": "^2.24.0",
     "morgan": "^1.9.1",
     "request": "^2.88.0",
     "serve-favicon": "^2.5.0",
-    "sqlite3": "^4.0.4",
+    "sqlite3": "^4.0.9",
     "swig-templates": "^2.0.3"
   },
   "devDependencies": {
-    "nodemon": "^1.18.7"
+    "nodemon": "^1.19.1"
   },
   "repository": {
     "type": "git",
