@@ -1,7 +1,7 @@
 'use strict';
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const db = require('../db');
+const db = require('../services/db');
 
 // Custom validator for express-validator: reserve some usernames
 exports.customValidators = {

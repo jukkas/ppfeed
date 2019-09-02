@@ -1,6 +1,6 @@
 "use strict";
 const htmlToText = require('html-to-text');
-const db = require('../db');
+const db = require('../services/db');
 const moment = require('moment');
 const Entities = require('html-entities').XmlEntities;
 const entities = new Entities();

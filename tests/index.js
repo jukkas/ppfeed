@@ -3,7 +3,7 @@ const request = require('supertest');
 const cheerio = require('cheerio');
 
 const app = require('../app');
-const { deleteUser, getUserItems } = require('../db');
+const { deleteUser, getUserItems } = require('../services/db');
 
 let loginCookie;
 let  credentials = {
