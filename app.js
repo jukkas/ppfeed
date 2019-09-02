@@ -44,9 +44,4 @@ app.get('/health', function (req, res) {
 
 app.use('/', routes);
 
-// Start server
-app.set('port', process.env.PORT || 3000);
-app.set('address', process.env.NODE_IP || 'localhost');
-app.listen(app.get('port'), app.get('address'), function() {
-    console.log(`Express server running: http://${app.get('address')}:${app.get('port')}`);
-});
+module.exports = app;

@@ -66,6 +66,17 @@ const addUser = ({username, hash}) => {
     return dbAll(sql, username, hash, time, time);
 }
 
+const deleteUser = async (username) => {
+    let sql = 'DELETE FROM Items WHERE username=?';
+    await dbAll(sql, username);
+
+    sql = 'DELETE FROM ExtFeeds WHERE username=?'
+    await dbAll(sql, username);
+
+    sql = 'DELETE FROM Users WHERE username=?';
+    return dbAll(sql, username);
+}
+
 const getUser = username => {
     return dbGetFirst('SELECT * FROM Users WHERE username = ?', username);
 }
@@ -136,6 +147,7 @@ const getExtFeed = id => {
 module.exports = {
     addUser,
     addItem,
+    deleteUser,
     getUser,
     getUserItems,
     deleteItem,
