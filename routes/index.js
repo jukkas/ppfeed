@@ -1,49 +1,56 @@
-var express = require('express');
-var router = express.Router();
-var path = require('path');
+const express = require('express');
+const router = express.Router();
+const asyncHandler = require('express-async-handler');
 
-var session = require('./session');
-var feed = require('./feed');
-var extfeed = require('./extfeed');
+const { ensureLoggedIn, ensurePersonal, login, logout, register } = require('../controllers/session.js');
+const { personalItems, podcastRss, itemAdd, itemDelete } = require('../controllers/feed.js');
+const { extFeeds, extFeedsAdd, extFeedsDelete, extFeedsAddToPPFeed, extFeedsGetFeed } = require('../controllers/extfeed');
 
-
-router.get('/', function(req, res) {
+/* Home page -> user specific or login */
+router.get('/', (req, res) => {
     if (req.session.username) {
         res.redirect(req.session.username);
-        return;
+      return;
     }
-    res.render('login', { title: 'ppfeed' });
+    res.redirect('login.html');
 });
 
-router.get('/ppfeed.png', function(req, res) {
-    res.sendFile(path.join(__dirname, '..' ,'public/images/ppfeed.png'));
-});
+// User session
+router.post('/login', asyncHandler(async (req, res, next) => {
+    await login(req, res);
+}));
+router.get('/logout', logout);
 
-router.post('/login', session.login);
-router.get('/logout', session.logout);
+// Items
+router.post('/items', ensureLoggedIn, asyncHandler(async (req, res, next) => {
+    await itemAdd(req, res);
+}));
+router.post('/items/:id/delete', ensureLoggedIn, asyncHandler(async (req, res, next) => {
+    await itemDelete(req, res, req.params.id);
+}));
 
-router.get('/register', function(req, res) {
-    res.render('register', { title: 'Register to ppfeed' });
-});
-router.post('/register', session.register);
+// Extfeeds
+router.get('/extfeeds', ensureLoggedIn,asyncHandler(async (req, res, next) => {
+    await extFeeds(req, res);
+}));
+router.post('/extfeeds', ensureLoggedIn,asyncHandler(async (req, res, next) => {
+    await extFeedsAdd(req, res);
+}));
 
-router.post('/delete', session.ensureLoggedIn, feed.deleteitem);
-router.post('/add', session.ensureLoggedIn, feed.additem);
-router.post('/items/:item/delete', session.ensureLoggedIn, session.ensurePersonal,
-            feed.deleteitem);
-router.post('/items/:item/add', session.ensureLoggedIn, session.ensurePersonal,
-            feed.additem);
-
-/* External feeds */
-router.get('/extfeeds', session.ensureLoggedIn,
-            extfeed.feeds);
-router.post('/extfeeds', session.ensureLoggedIn, extfeed.addFeed);
-router.get('/extfeeds/:id', session.ensureLoggedIn, extfeed.getFeed);
-router.post('/extfeeds/:id/delete', session.ensureLoggedIn, extfeed.deleteFeed);
-router.post('/extfeeds/:id', session.ensureLoggedIn, extfeed.addToPPFeed);
+router.get('/extfeeds/:id', ensureLoggedIn, extFeedsGetFeed);
+router.post('/extfeeds/:id/delete', ensureLoggedIn, extFeedsDelete);
+router.post('/extfeeds/:id', ensureLoggedIn, extFeedsAddToPPFeed);
 
 /* Personal feeds */
-router.get('/:user', session.ensureLoggedIn, session.ensurePersonal, feed.items);
-router.get('/:user/rss', feed.xml);
+router.get('/:username', ensureLoggedIn, ensurePersonal, asyncHandler(async (req, res, next) => {
+    await personalItems(req, res, req.params.username);
+}));
+router.get('/:username/rss', asyncHandler(async (req, res, next) => {
+    await podcastRss(req, res, req.params.username);
+}));
+
+
+router.post('/register', register);
+
 
 module.exports = router;

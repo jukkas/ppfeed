@@ -7,8 +7,8 @@ const { deleteUser, getUserItems } = require('../services/db');
 
 let loginCookie;
 let  credentials = {
-    uname: "testuser",
-    pword: "testpass"
+    username: "testuser",
+    password: "testpass"
 };
 let regex = new RegExp(credentials.username);
 
@@ -16,12 +16,10 @@ test('Register and login tests', function(t) {
     t.test('Home page', function(assert) {
         request(app)
         .get('/')
-        .expect(200)
+        .expect(302)
+        .expect('location', /login/)
         .end(function(err, res) {
             assert.error(err, 'No error');
-            const $ = cheerio.load(res.text);
-            const formAction = $('form').attr('action');
-            assert.ok(formAction == '/login', 'Login form found in HTML');
             assert.end();
         });
     });
@@ -53,7 +51,7 @@ test('Register and login tests', function(t) {
     });
     t.test('User feed page', function(assert) {
         request(app)
-        .get(`/${credentials.uname}`)
+        .get(`/${credentials.username}`)
         .set('cookie', loginCookie)
         .expect(200)
         .end(function(err, res) {
@@ -74,14 +72,14 @@ test('Feed Items tests', function(t) {
 
     t.test('Add first item', function(assert) {
         request(app)
-        .post('/add')
+        .post('/items')
         .set('cookie', loginCookie)
         .send(item)
         .expect(302)
         .expect('location', regex)
         .end(async function(err, res) {
             assert.error(err, 'No error');
-            const items = await getUserItems({username: credentials.uname});
+            const items = await getUserItems({username: credentials.username});
             itemId = items[0].id;
             assert.ok(items[0].media_url == item.url, 'Database contains posted item');
             assert.end();
@@ -89,14 +87,18 @@ test('Feed Items tests', function(t) {
     });
     t.test('User feed page with new entry', function(assert) {
         request(app)
-        .get(`/${credentials.uname}`)
+        .get(`/${credentials.username}`)
         .set('cookie', loginCookie)
         .expect(200)
         .end(function(err, res) {
             assert.error(err, 'No error');
             const $ = cheerio.load(res.text);
-            const title = $('.episode-list tr td').first().text().trim();
+            const title = $('.episode-list tr td').text().trim();
             assert.ok(title == item.title, 'Item title matches')
+            const form = $('.episode-list tr td form').attr('action');
+            let idInFormMatch = form.match(/\/(\d+)\//);
+            let idInForm =  idInFormMatch ? +idInFormMatch[1] : null;
+            assert.ok(itemId == idInForm, 'Delete item form found in HTML');
             assert.end();
         });
     });
@@ -112,14 +114,14 @@ test('Rss and delete tests', function(t) {
 
     t.test('Add second item', function(assert) {
         request(app)
-        .post('/add')
+        .post('/items')
         .set('cookie', loginCookie)
         .send(item)
         .expect(302)
         .expect('location', regex)
         .end(async function(err, res) {
             assert.error(err, 'No error');
-            const items = await getUserItems({username: credentials.uname});
+            const items = await getUserItems({username: credentials.username});
             itemId = items[0].id;
             assert.ok(items[0].media_url == item.url, 'Database contains posted item');
             assert.end();
@@ -127,8 +129,7 @@ test('Rss and delete tests', function(t) {
     });
     t.test('User RSS feed page', function(assert) {
         request(app)
-        .get(`/${credentials.uname}/rss`)
-        .set('cookie', loginCookie)
+        .get(`/${credentials.username}/rss`)
         .expect(200)
         .end(function(err, res) {
             assert.error(err, 'No error');
@@ -136,7 +137,7 @@ test('Rss and delete tests', function(t) {
                 normalizeWhitespace: true,
                 xmlMode: true
             });
-            assert.ok($('item title').get().length >= 2, '2 items found')
+            assert.ok($('item title').get().length == 2, '2 items found')
             const title = $('item title').eq(0).text();
             assert.ok(title == item.title, 'Item title matches')
 
@@ -145,14 +146,13 @@ test('Rss and delete tests', function(t) {
     });
     t.test('Delete second item', function(assert) {
         request(app)
-        .post('/delete')
+        .post(`/items/${itemId}/delete`)
         .set('cookie', loginCookie)
-        .send({item:itemId})
         .expect(302)
         .expect('location', regex)
         .end(async function(err, res) {
             assert.error(err, 'No error');
-            const items = await getUserItems({username: credentials.uname});
+            const items = await getUserItems({username: credentials.username});
             assert.ok(items.length === 1, 'Database contains just one item now');
             assert.end();
         });
@@ -209,7 +209,7 @@ test('Extfeeds tests', function(t) {
         });
     });
     t.test('Add item from extfeed to personal feed', async function(assert) {
-        const initialItems = await getUserItems({username: credentials.uname});
+        const initialItems = await getUserItems({username: credentials.username});
         const initialItemCount = initialItems.length;
 
         request(app)
@@ -219,7 +219,7 @@ test('Extfeeds tests', function(t) {
         .expect(302)
         .end(async function(err, res) {
             assert.error(err, 'No error');
-            const newItems = await getUserItems({username: credentials.uname});
+            const newItems = await getUserItems({username: credentials.username});
             const newItemCount = newItems.length;
             assert.ok(newItemCount == initialItemCount + 1, 'Database contains new item');
             assert.end();
@@ -230,7 +230,7 @@ test('Extfeeds tests', function(t) {
 
 
 test('Cleanup database', async function(t) {
-    await deleteUser(credentials.uname);
+    await deleteUser(credentials.username);
     t.end();
 });
 

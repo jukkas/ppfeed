@@ -1,4 +1,3 @@
-- refactor express/controller/services
-- session.js: register error messages to UI
 - UI needs redesign
+- session.js: register error messages to UI
 

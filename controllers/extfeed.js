@@ -1,7 +1,6 @@
 'use strict';
 const htmlToText = require('html-to-text');
 const db = require('../services/db');
-const moment = require('moment');
 const request = require('request');
 const FeedParser = require('feedparser');
 const debug = require('debug')('ppfeed')
@@ -20,14 +19,14 @@ function cleanCache() {
 }
 
 // Render external feeds of a user
-exports.feeds = function (req, res) {
-    res.clearCookie('error');
+exports.extFeeds = function (req, res) {
+    //res.clearCookie('error');
     db.getExtFeeds(req.session.username)
     .then(feeds => {
         res.render('extfeeds', {
             title: 'External feeds for ' + req.session.username,
             user: req.session.username,
-            error: req.cookies ? req.cookies.error:null,
+            //error: req.cookies ? req.cookies.error:null,
             feeds: feeds,
         });
     })
@@ -42,7 +41,7 @@ exports.feeds = function (req, res) {
 };
 
 // Delete external feed
-exports.deleteFeed = function (req, res) {
+exports.extFeedsDelete = function (req, res) {
     debug('Deleting feed' + req.params.id);
     db.deleteExtFeed({id: req.params.id, username: req.session.username})
     .catch(err => console.log(err));
@@ -50,7 +49,7 @@ exports.deleteFeed = function (req, res) {
 };
 
 // Add new external feed
-exports.addFeed = function (req, res) {
+exports.extFeedsAdd = function (req, res) {
     if (!req.body.url || !req.body.url.startsWith('http')) {
         console.log('addFeed: Invalid url '+req.body.url);
         res.cookie('error','Invalid url '+req.body.url);
@@ -95,7 +94,7 @@ exports.addFeed = function (req, res) {
 };
 
 // Add clicked entry from an external feed into personal feed
-exports.addToPPFeed = function (req, res) {
+exports.extFeedsAddToPPFeed = function (req, res) {
     debug('addToPPFeed',req.body, req.params.id);
 
     if (cache.get(req.params.id)) {
@@ -127,12 +126,12 @@ exports.addToPPFeed = function (req, res) {
 };
 
 // Get single external feed from cache or download it + render it
-exports.getFeed = async function (req, res) {
+exports.extFeedsGetFeed = async function (req, res) {
 
     cleanCache();
 
     if (cache.get(req.params.id)) {
-        console.log('@@getfeed,cached');
+        debug('Showing cached version');
         return res.render('extfeed', cache.get(req.params.id));
     }
     
@@ -142,6 +141,7 @@ exports.getFeed = async function (req, res) {
         if (!feedArr || feedArr.length != 1)
             throw new Error('Feed not found');
 
+        debug('Fetching from', feedArr[0].url);
         let r = request(feedArr[0].url);
         let feedparser = new FeedParser();
         r.on('error', done);

@@ -6,10 +6,8 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const swig = require('swig-templates');
 const session = require('cookie-session');
-const expressValidator = require('express-validator');
 
 const routes = require('./routes');
-const sessionRoute = require('./routes/session');
 
 const app = express();
 
@@ -23,11 +21,11 @@ app.set('view cache', false); // Swig will cache templates
 //temp disable caching
 //swig.setDefaults({ cache: false });
 
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('[:date] :remote-addr :method :url :status :res[content-length] ":referrer" ":user-agent"'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(expressValidator(sessionRoute.customValidators));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Cookie based session
