@@ -6,7 +6,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "DEBUG=ppfeed nodemon server.js"
+    "dev": "DEBUG=ppfeed nodemon server.js",
+    "tests": "node tests"
   },
   "author": "Jukka S <jukkas@gmail.com>",
   "license": "proprietary",
