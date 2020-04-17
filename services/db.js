@@ -1,147 +1,108 @@
-const dataDir = process.env.PPFEED_DATA_DIR || '.'
-
 const debug = require('debug')('ppfeed')
-const path = require('path');
-const fs = require("fs");
+const { Client } = require('pg')
 
-//const dbFile = path.join(dataDir, '..', 'ppfeed.db');
-const dbFile = path.join(dataDir, 'ppfeed.db');
-const dbExists = fs.existsSync(dbFile);
+const connectionString = process.env.POSTGRESQL_URI;
 
-const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database(dbFile);
-
-// Init
-db.serialize(function() {
-    if(!dbExists) {
-        console.log('Database not found. Creating...');
-        db.run("CREATE TABLE Users (username TEXT NOT NULL UNIQUE," +
-                "hash TEXT, regtime DATETIME, lasttime DATETIME)",
-                function(err, result) {});
-        db.run("CREATE TABLE Items (id INTEGER PRIMARY KEY,username TEXT," +
-                "media_url TEXT,title TEXT,description TEXT," +
-                "link TEXT,time DATETIME)", function(err, result) {});
-        db.run("CREATE TABLE ExtFeeds (id INTEGER PRIMARY KEY, username TEXT," +
-                "url TEXT, title TEXT)", function(err, result) {});
-        db.run("CREATE TABLE Settings (key NOT NULL UNIQUE, value TEXT)",
-                                        function(err, result) {});
-    }
+const client = new Client({
+    connectionString: connectionString,
+});
+client.connect();
+client.on('error', err => {
+    console.error('Postgresql client connection error', err.stack);
 });
 
 
-const dbAll = (sql, ...args) => {
-    return new Promise((resolve, reject) => {
-        // With method 'run' we get lastID, with 'all' we get rows
-        let method = sql.toLowerCase().startsWith('select') ? 'all':'run';
-        db[method](sql, args, (err, rows) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            if (method === 'run')
-                resolve(this.lastID);
-            else
-                resolve(rows);
+const addUser = ({ username, hash }) => {
+    const sql = 'INSERT INTO "ppfeed.users"' +
+        '(username, hash) VALUES ' +
+        '($1, $2) RETURNING regtime';
+    return client.query(sql, [username, hash]);
+    //.catch(e => console.error(e.stack));
+}
+
+const deleteUser = username => {
+    let sql = 'DELETE FROM "ppfeed.users" WHERE username=$1';
+    return client.query(sql, [username])
+}
+
+const getUser = (username) => {
+    let sql = 'SELECT * FROM "ppfeed.users" WHERE username=$1';
+    return client.query(sql, [username])
+        .then(retval => {
+            return retval.rows[0];
         });
-    });
 }
 
-const dbGetFirst = (sql, ...args) => {
-    return new Promise((resolve, reject) => {
-        db.get(sql, args, (err, row) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(row);
-        });
-    });
-}
-
-
-const addUser = ({username, hash}) => {
-    const time = new Date().toISOString();
-    const sql = 'INSERT INTO Users' +
-                '(username, hash, regtime, lasttime) VALUES ' +
-                '(?, ?, ?, ?)';
-    return dbAll(sql, username, hash, time, time);
-}
-
-const deleteUser = async (username) => {
-    let sql = 'DELETE FROM Items WHERE username=?';
-    await dbAll(sql, username);
-
-    sql = 'DELETE FROM ExtFeeds WHERE username=?'
-    await dbAll(sql, username);
-
-    sql = 'DELETE FROM Users WHERE username=?';
-    return dbAll(sql, username);
-}
-
-const getUser = username => {
-    return dbGetFirst('SELECT * FROM Users WHERE username = ?', username);
-}
-
-const getUserItems = ({username, limit}) => {
-
+const getUserItems = ({ username, limit }) => {
     let sql = 'SELECT id, media_url, title, description, link, time ' +
-    'FROM Items WHERE username = ? ORDER BY id DESC';
+        'FROM "ppfeed.items" WHERE username = $1 ORDER BY id DESC';
     let sqlParams = [username];
     if (limit) {
-        sql += ' LIMIT ?';
+        sql += ' LIMIT $2';
         sqlParams.push(limit);
     }
-    return dbAll(sql, ...sqlParams);
+    return client.query(sql, sqlParams)
+        .then(retval => {
+            return retval.rows;
+        });
 }
 
 // TODO: test error case
-const deleteItem = ({id, username}) => {
+const deleteItem = ({ id, username }) => {
     if (!id || !username)
         return;
-    debug('DELETE FROM Items WHERE id='+id,'AND username='+username);
-    return dbAll('DELETE FROM Items WHERE id=? AND username=?', id, username);
+    debug('DELETE FROM "ppfeed.items" WHERE id=' + id, 'AND username=' + username);
+    const sql = 'DELETE FROM "ppfeed.items" WHERE id=$1 AND username=$2';
+    return client.query(sql, [id, username]);
 }
 
 // TODO: better error handling
-const addItem = ({username, media_url, title, description, link}) => {
-        if (username && media_url && title) {
-                description = description || " ";
-                const currentTime = new Date();
-                //const time = currentTime.toISOString();
-                const sql = 'INSERT INTO Items' +
-                  '(username, media_url, title, description, link, time) VALUES ' +
-                  '(?, ?, ?, ?, ?, ?)';
-            debug(sql, username, media_url, title,
-                description.substring(0, 20)+'...', link, currentTime);
-            return dbAll(sql, username, media_url, title, description, link, currentTime);
-        }
-        return;
-}
-
-const getExtFeeds = username => {
-    return dbAll('SELECT * FROM ExtFeeds WHERE username=?', username);
-}
-
-const deleteExtFeed = ({id, username}) => {
-    if (id && username) {
-        debug('DELETE FROM ExtFeeds WHERE id='+id+' AND username='+username);
-        return dbAll('DELETE FROM ExtFeeds WHERE id=? AND username=?', id, username);
+const addItem = ({ username, media_url, title, description, link }) => {
+    if (username && media_url && title) {
+        description = description || " ";
+        const currentTime = new Date();
+        //const time = currentTime.toISOString();
+        const sql = 'INSERT INTO "ppfeed.items"' +
+            '(username, media_url, title, description, link, time) VALUES ' +
+            '($1, $2, $3, $4, $5, $6)';
+        debug(sql, username, media_url, title,
+            description.substring(0, 20) + '...', link, currentTime);
+        return client.query(sql, [username, media_url, title, description, link, currentTime]);
     }
     return;
 }
 
-const addExtFeed = ({username, url, title}) => {
+const getExtFeeds = username => {
+    return client.query('SELECT * FROM "ppfeed.extfeeds" WHERE username=$1', [username])
+        .then(retval => {
+            return retval.rows;
+        });
+}
+
+const deleteExtFeed = ({ id, username }) => {
+    if (id && username) {
+        debug('DELETE FROM "ppfeed.extfeeds" WHERE id=' + id + ' AND username=' + username);
+        return client.query('DELETE FROM "ppfeed.extfeeds" WHERE id=$1 AND username=$2', [id, username]);
+    }
+    return;
+}
+
+const addExtFeed = ({ username, url, title }) => {
     if (username && url && title) {
-        const sql = 'INSERT INTO ExtFeeds' +
-                '(username, url, title) VALUES ' +
-                '(?, ?, ?)';
+        const sql = 'INSERT INTO "ppfeed.extfeeds"' +
+            '(username, url, title) VALUES ' +
+            '($1, $2, $3)';
         debug(sql, username, url, title);
-        return dbAll(sql, username, url, title);
+        return client.query(sql, [username, url, title]);
     }
     return;
 }
 
 const getExtFeed = id => {
-    return dbAll('SELECT * FROM ExtFeeds WHERE id = ?', id);
+    return client.query('SELECT * FROM "ppfeed.extfeeds" WHERE id = $1', [id])
+        .then(retval => {
+            return retval.rows;
+        });
 }
 
 module.exports = {

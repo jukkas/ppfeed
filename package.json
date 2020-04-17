@@ -26,9 +26,9 @@
     "html-to-text": "^8.2.0",
     "http-errors": "^2.0.0",
     "morgan": "^1.10.0",
+    "pg": "^8.0.2",
     "request": "^2.88.2",
-    "serve-favicon": "^2.5.0",
-    "sqlite3": "^5.0.8"
+    "serve-favicon": "^2.5.0"
   },
   "devDependencies": {
     "cheerio": "^1.0.0-rc.11",
