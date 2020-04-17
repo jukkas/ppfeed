@@ -1,0 +1,4 @@
+PPFEED_SESSION_SECRET=changethissessionsecret
+PORT=3000
+NODE_IP=localhost
+#PPFEED_DATA_DIR=
