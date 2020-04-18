@@ -48,8 +48,8 @@ test('Add item', async function(t) {
     t.pass('No errors adding item');
 
     const items = await getUserItems({username});
-    t.equal(items[0].title, testItem.title), 'item and title found from database';
-    t.equal(items[0].media_url, testItem.media_url), 'item and media_url found from database';
+    t.equal(items[0].title, testItem.title, 'item and title found from database');
+    t.equal(items[0].media_url, testItem.media_url, 'item and media_url found from database');
     testItemId = items[0].id;
     t.end();
 });
