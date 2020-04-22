@@ -4,7 +4,7 @@ CREATE TABLE "ppfeed.users" (
     username    TEXT PRIMARY KEY NOT NULL,
     hash        TEXT,
     regtime     TIMESTAMP NOT NULL DEFAULT current_timestamp,
-    updatedtime TIMESTAMP
+    updatedtime TIMESTAMPTZ NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc')
 );
 
 CREATE TABLE "ppfeed.items" (
