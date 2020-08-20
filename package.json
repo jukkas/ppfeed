@@ -11,7 +11,7 @@
   "author": "Jukka S <jukkas@gmail.com>",
   "license": "proprietary",
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "cookie-session": "^2.0.0-beta.3",
     "date-fns": "^2.0.1",
     "debug": "^4.1.1",
