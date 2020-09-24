@@ -1,11 +1,11 @@
-const dataDir = process.env.PPFEED_DATA_DIR ||
-                process.env.OPENSHIFT_DATA_DIR || __dirname;
+const dataDir = process.env.PPFEED_DATA_DIR || '.'
 
 const debug = require('debug')('ppfeed')
 const path = require('path');
 const fs = require("fs");
 
-const dbFile = path.join(dataDir, '..', 'ppfeed.db');
+//const dbFile = path.join(dataDir, '..', 'ppfeed.db');
+const dbFile = path.join(dataDir, 'ppfeed.db');
 const dbExists = fs.existsSync(dbFile);
 
 const sqlite3 = require("sqlite3").verbose();
