@@ -12,7 +12,11 @@ const routes = require('./routes');
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: false, // I want my local development to work
+    hsts: false, // I want my local development to work
+  })
+);
 
 // view engine setup
 app.engine('html', swig.renderFile);
