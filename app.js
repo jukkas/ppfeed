@@ -5,7 +5,7 @@ const createError = require('http-errors');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
-const swig = require('swig-templates');
+const swig = require('free-swig');
 const session = require('cookie-session');
 
 const routes = require('./routes');
