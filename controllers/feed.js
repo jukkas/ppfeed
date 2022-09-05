@@ -25,7 +25,7 @@ const podcastRss = async function (req, res, username) {
         limit = 0;
     }
 
-    const items = await getUserItems({username, limit});
+    const items = await getUserItems({ username, limit });
 
     res.set('Content-Type', 'application/rss+xml; charset=utf-8');
     res.render('xml', constructPodcastRss(items, username, req.headers.host));
@@ -46,11 +46,11 @@ const itemAdd = async function (req, res) {
         console.log("Invalid parameters");
         return res.redirect('../');
     }
-    if (link && !isURL(link)) link=null;
+    if (link && !isURL(link)) link = null;
 
     await addItem({
         username,
-        media_url:url,
+        media_url: url,
         title,
         description,
         link
@@ -60,7 +60,7 @@ const itemAdd = async function (req, res) {
 }
 
 const itemDelete = async function (req, res, itemId) {
-    await deleteItem({id: itemId, username: req.session.username});
+    await deleteItem({ id: itemId, username: req.session.username });
     res.redirect('../../' + req.session.username);
 }
 

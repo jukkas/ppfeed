@@ -59,22 +59,22 @@ const register = (req, res) => {
 
     if (!username || !password || password.length < 2 || username.length < 1 ||
         !username.match(/^[0-9a-z]+$/) ||
-        ['login','logout','register','items','extfeeds','admin','null','undefined'].includes(username)) {
-            console.log('Invalid registration data');
-            res.redirect('register.html');
+        ['login', 'logout', 'register', 'items', 'extfeeds', 'admin', 'null', 'undefined'].includes(username)) {
+        console.log('Invalid registration data');
+        res.redirect('register.html');
     }
 
-    bcrypt.hash(password, saltRounds, function(err, hash) {
-        addUser({username: username, hash})
-        .then(() => {
-            console.log('New user:', username);
-            req.session.username = username;
-            res.redirect(`../${username}`);
-        })
-        .catch(err => {
-            console.log('Error registering new user',username, err);
-            return res.redirect('register.html');
-        })
+    bcrypt.hash(password, saltRounds, function (err, hash) {
+        addUser({ username: username, hash })
+            .then(() => {
+                console.log('New user:', username);
+                req.session.username = username;
+                res.redirect(`../${username}`);
+            })
+            .catch(err => {
+                console.log('Error registering new user', username, err);
+                return res.redirect('register.html');
+            })
     });
 };
 

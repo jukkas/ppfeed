@@ -10,7 +10,7 @@ const { extFeeds, extFeedsAdd, extFeedsDelete, extFeedsAddToPPFeed, extFeedsGetF
 router.get('/', (req, res) => {
     if (req.session.username) {
         res.redirect(req.session.username);
-      return;
+        return;
     }
     res.redirect('login.html');
 });
@@ -30,10 +30,10 @@ router.post('/items/:id/delete', ensureLoggedIn, asyncHandler(async (req, res, n
 }));
 
 // Extfeeds
-router.get('/extfeeds', ensureLoggedIn,asyncHandler(async (req, res, next) => {
+router.get('/extfeeds', ensureLoggedIn, asyncHandler(async (req, res, next) => {
     await extFeeds(req, res);
 }));
-router.post('/extfeeds', ensureLoggedIn,asyncHandler(async (req, res, next) => {
+router.post('/extfeeds', ensureLoggedIn, asyncHandler(async (req, res, next) => {
     await extFeedsAdd(req, res);
 }));
 

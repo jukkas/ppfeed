@@ -2,14 +2,14 @@
 <html>
 
 <head>
-    <title>{{ title }}</title>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <link rel='stylesheet' href='style.css' />
+  <title>{{ title }}</title>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+  <link rel='stylesheet' href='style.css' />
 </head>
 
 <body>
-<h2>Add new episode</h2>
-<div id="newitem">
+  <h2>Add new episode</h2>
+  <div id="newitem">
     <form class="newitem" name="newitem" action="../items" method="post">
       <div>
         <label for="url">URL</label>
@@ -32,32 +32,32 @@
         <button type="submit">Add</button>
       </div>
     </form>
-</div>
-<br>
-<h2>Episodes</h2>
-<table class="episode-list">
-{% for item in items %}
+  </div>
+  <br>
+  <h2>Episodes</h2>
+  <table class="episode-list">
+    {% for item in items %}
     <tr>
-        <td title="{{ item.description }}">
-            {% if item.link %}<a href="{{ item.link }}" class="item" title="{{ item.description }}">{% endif %}
-            {{ item.title }}
-            {% if item.link %}</a>{% endif %}
-        </td>
-        <td>
-            <form name="delete" action="../items/{{item.id}}/delete" method="post">
-                <!-- TODO: RESTify  -->
-                <input type="hidden" name="item", value="{{item.id}}">
-                <input type="submit" value="Delete" class="deletebtn" title="Remove episode">
-            </form>
-        </td>
+      <td title="{{ item.description }}">
+        {% if item.link %}<a href="{{ item.link }}" class="item" title="{{ item.description }}">{% endif %}
+          {{ item.title }}
+          {% if item.link %}</a>{% endif %}
+      </td>
+      <td>
+        <form name="delete" action="../items/{{item.id}}/delete" method="post">
+          <!-- TODO: RESTify  -->
+          <input type="hidden" name="item" , value="{{item.id}}">
+          <input type="submit" value="Delete" class="deletebtn" title="Remove episode">
+        </form>
+      </td>
     </tr>
-{% endfor %}
+    {% endfor %}
 
-</table>
+  </table>
 
-<nav>
-<a href="extfeeds">External feeds</a> <a href="/logout">Logout</a>
-</nav>
+  <nav>
+    <a href="extfeeds">External feeds</a> <a href="/logout">Logout</a>
+  </nav>
 
 </body>
 
