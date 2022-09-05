@@ -1,7 +1,8 @@
 'use strict';
-const htmlToText = require('html-to-text');
+const { convert } = require('html-to-text');
 const db = require('../services/db');
-const request = require('request');
+//const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const fetch = require('node-fetch');
 const FeedParser = require('feedparser');
 const debug = require('debug')('ppfeed')
 
@@ -57,16 +58,18 @@ exports.extFeedsAdd = function (req, res) {
     }
     var meta;
     // Download feed (to get title)
-    var r = request(req.body.url);
-    var feedparser = new FeedParser();
-    r.on('error', done);
-    r.on('response', function (resp) {
-        var stream = this;
-        if (resp.statusCode != 200)
-            return done(new Error('Bad status code'));
-        stream.pipe(feedparser);
-    });
+    const r = fetch(req.body.url);
+    const feedparser = new FeedParser();
 
+    r.then(function (res) {
+        if (res.status !== 200) {
+            return done(new Error('Bad status code'));
+        } else {
+            res.body.pipe(feedparser);
+        }
+    }, function (err) {
+        return done(err);
+    });
     feedparser.on('error', done);
     feedparser.on('end', done);
     feedparser.on('meta', function(feedMeta) {
@@ -142,14 +145,16 @@ exports.extFeedsGetFeed = async function (req, res) {
             throw new Error('Feed not found');
 
         debug('Fetching from', feedArr[0].url);
-        let r = request(feedArr[0].url);
-        let feedparser = new FeedParser();
-        r.on('error', done);
-        r.on('response', function (resp) {
-            var stream = this;
-            if (resp.statusCode < 200 || resp.statusCode >= 300)
-                return done(new Error(`Bad status code ${resp.statusCode}`));
-            stream.pipe(feedparser);
+        const r = fetch(feedArr[0].url);
+        const feedparser = new FeedParser();
+        r.then(function (res) {
+            if (res.status < 200 || res.status > 299) {
+                return done(new Error(`Bad status code ${res.statusCode}`));
+            } else {
+                res.body.pipe(feedparser);
+            }
+        }, function (err) {
+            return done(err);
         });
 
         feedparser.on('error', parseErr);
@@ -160,7 +165,7 @@ exports.extFeedsGetFeed = async function (req, res) {
 
             while (item = stream.read()) {
                 if (item.description && item.description.includes('<') && item.description.includes('>'))
-                    item.description = htmlToText.fromString(item.description);
+                    item.description = convert(item.description);
                 feed.items.push(item);
             }
 
