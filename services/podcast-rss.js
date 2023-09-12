@@ -1,8 +1,8 @@
 const format = require('date-fns/format');
 
 const constructPodcastRss = (items, username, host) => {
-    const channelLink = 'http://' + (host || 'localhost'); // TODO: https/https from config
-    const channelImage = channelLink + '/ppfeed.png'; //TODO: from config
+    const channelLink = process.env.PPFEED_URL || 'http://' + (host || 'localhost') + '/';
+    const channelImage = channelLink + 'ppfeed.png';
 
     // Add stuff to items
     for (item of items) {
@@ -16,7 +16,7 @@ const constructPodcastRss = (items, username, host) => {
         }
 
         item.pubDate = format(new Date(item.time), 'EEE, d MMM yyyy HH:mm:ss XX');
-        item.guid = item.media_url.replace('&','_');
+        item.guid = item.media_url.replace('&', '_');
     }
     const rss = {
         channelTitle: `Personal Podcast Feed for ${username}`,

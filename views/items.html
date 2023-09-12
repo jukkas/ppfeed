@@ -10,7 +10,7 @@
 <body>
   <h2>Add new episode</h2>
   <div id="newitem">
-    <form class="newitem" name="newitem" action="../items" method="post">
+    <form class="newitem" name="newitem" action="items" method="post">
       <div>
         <label for="url">URL</label>
         <input type="text" id="url" name="url">
@@ -44,7 +44,7 @@
           {% if item.link %}</a>{% endif %}
       </td>
       <td>
-        <form name="delete" action="../items/{{item.id}}/delete" method="post">
+        <form name="delete" action="./items/{{item.id}}/delete" method="post">
           <!-- TODO: RESTify  -->
           <input type="hidden" name="item" , value="{{item.id}}">
           <input type="submit" value="Delete" class="deletebtn" title="Remove episode">

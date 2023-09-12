@@ -56,7 +56,7 @@ const itemAdd = async function (req, res) {
         link
     });
 
-    res.redirect('../' + username);
+    res.redirect(username);
 }
 
 const itemDelete = async function (req, res, itemId) {

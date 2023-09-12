@@ -48,7 +48,7 @@ const login = async (req, res) => {
             return logout(req, res);
         }
         req.session.username = username;
-        res.redirect('../' + username);
+        res.redirect('./' + username);
     });
 };
 
